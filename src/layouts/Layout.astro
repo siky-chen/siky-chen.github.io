@@ -420,25 +420,25 @@ if (siteConfig.font) {
 
 	@layer components {
 		.enable-banner.is-home #banner-wrapper {
-			@apply xl:h-(--banner-height-home) xl:translate-y-[var(--banner-height-extend)];
+			@apply lg:h-(--banner-height-home) lg:translate-y-[var(--banner-height-extend)];
 		}
 		.enable-banner #banner-wrapper {
-			@apply xl:h-[var(--banner-height-home)];
+			@apply lg:h-[var(--banner-height-home)];
 		}
 		.enable-banner.is-home #banner {
-			@apply xl:h-(--banner-height-home) xl:translate-y-0;
+			@apply lg:h-(--banner-height-home) lg:translate-y-0;
 		}
 		.enable-banner #banner {
-			@apply xl:h-(--banner-height-home) xl:translate-y-[var(--bannerOffset)];
+			@apply lg:h-(--banner-height-home) lg:translate-y-[var(--bannerOffset)];
 		}
 		.enable-banner.is-home #main-grid {
-			@apply xl:translate-y-[var(--banner-height-extend)];
+			@apply lg:translate-y-[var(--banner-height-extend)];
 		}
 		.enable-banner #top-row {
-			@apply xl:h-[calc(var(--banner-height-home)-4.5rem)] transition-all duration-300;
+			@apply lg:h-[calc(var(--banner-height-home)-4.5rem)] transition-all duration-300;
 		}
 		.enable-banner.is-home #sidebar-sticky {
-			@apply xl:top-[calc(1rem_-_var(--banner-height-extend))];
+			@apply lg:top-[calc(1rem_-_var(--banner-height-extend))];
 		}
 		.navbar-hidden {
 			@apply opacity-0 -translate-y-16;
