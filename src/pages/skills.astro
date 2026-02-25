@@ -75,16 +75,16 @@ const getLevelWidth = (level: string) => {
 // 获取分类的显示文本
 const getCategoryText = (category: string) => {
 	switch (category) {
-		case "frontend":
-			return i18n(I18nKey.skillsFrontend);
-		case "backend":
-			return i18n(I18nKey.skillsBackend);
-		case "database":
-			return i18n(I18nKey.skillsDatabase);
+		case "mcu":
+			return i18n(I18nKey.skillsMCU);
+		case "soc":
+			return i18n(I18nKey.skillsSOC);
 		case "tools":
 			return i18n(I18nKey.skillsTools);
-		case "other":
-			return i18n(I18nKey.skillsOther);
+		case "robotics":
+			return i18n(I18nKey.skillsRobotics);
+		case "vision":
+			return i18n(I18nKey.skillsVision);
 		case UNCATEGORIZED:
 			return i18n(I18nKey.uncategorized);
 		default:

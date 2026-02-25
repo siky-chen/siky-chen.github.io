@@ -56,11 +56,11 @@ interface Props {
 			expert: number;
 		};
 		byCategory: {
-			frontend: number;
-			backend: number;
-			database: number;
+			mcu: number;
+			soc: number;
 			tools: number;
-			other: number;
+			robotics: number;
+			vision: number;
 		};
 	};
 	totalExperience: {
@@ -80,11 +80,11 @@ const levelColors = {
 };
 
 const categoryColors = {
-	frontend: "#3B82F6", // blue-500
-	backend: "#8B5CF6", // violet-500
-	database: "#10B981", // emerald-500
+	mcu: "#3B82F6", // blue-500
+	soc: "#8B5CF6", // violet-500
 	tools: "#F59E0B", // amber-500
-	other: "#EC4899", // pink-500
+	robotics: "#10B981", // emerald-500
+	vision: "#EC4899", // pink-500
 };
 
 // 计算扇形图数据（按技能等级）
@@ -114,19 +114,14 @@ const levelData = [
 // 计算矩形图数据（按技能分类）
 const categoryData = [
 	{
-		name: i18n(I18nKey.skillsFrontend),
-		value: stats.byCategory.frontend,
-		color: categoryColors.frontend,
+		name: i18n(I18nKey.skillsMCU),
+		value: stats.byCategory.mcu,
+		color: categoryColors.mcu,
 	},
 	{
-		name: i18n(I18nKey.skillsBackend),
-		value: stats.byCategory.backend,
-		color: categoryColors.backend,
-	},
-	{
-		name: i18n(I18nKey.skillsDatabase),
-		value: stats.byCategory.database,
-		color: categoryColors.database,
+		name: i18n(I18nKey.skillsSOC),
+		value: stats.byCategory.soc,
+		color: categoryColors.soc,
 	},
 	{
 		name: i18n(I18nKey.skillsTools),
@@ -134,9 +129,14 @@ const categoryData = [
 		color: categoryColors.tools,
 	},
 	{
-		name: i18n(I18nKey.skillsOther),
-		value: stats.byCategory.other,
-		color: categoryColors.other,
+		name: i18n(I18nKey.skillsRobotics),
+		value: stats.byCategory.robotics,
+		color: categoryColors.robotics,
+	},
+	{
+		name: i18n(I18nKey.skillsVision),
+		value: stats.byCategory.vision,
+		color: categoryColors.vision,
 	},
 ];
 
