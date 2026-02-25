@@ -3,6 +3,7 @@ title: "CAN 协议详解：从物理层到帧仲裁与错误处理"
 published: 2024-02-25
 draft: false
 description: "结合 CAN 总线常见规范，系统梳理 CAN 的结构、位时序、帧格式、仲裁规则与错误处理机制"
+image: "25de04036efded0cdf0233dfe3b627cb.webp"
 category: "嵌入式"
 tags: ["CAN", "驱动", "通信协议", "STM32", "总线"]
 ---
@@ -10,7 +11,7 @@ tags: ["CAN", "驱动", "通信协议", "STM32", "总线"]
 # CAN 协议详解：从物理层到帧仲裁与错误处理
 
 
-![封面图](./can-protocol-images/25de04036efded0cdf0233dfe3b627cb.webp)
+![封面图](25de04036efded0cdf0233dfe3b627cb.webp)
 
 ## 1. CAN 是什么
 
@@ -25,7 +26,7 @@ CAN（Controller Area Network）是面向实时控制场景的串行总线协议
 
 典型应用包括汽车电子、工业控制、船舶、医疗设备等。
 
-![车载网络示意](./can-protocol-images/da678996fcfca3a295d610731e30452f.webp)
+![车载网络示意](da678996fcfca3a295d610731e30452f.webp)
 
 ## 2. CAN 总线结构与物理层
 
@@ -38,17 +39,17 @@ CAN 使用两根信号线 `CAN_H` 和 `CAN_L`，通过电压差表达逻辑电�
 
 总线具备“线与”特性：如果有节点发送显性位，最终总线表现为显性位。这个机制是 CAN 位仲裁的基础。
 
-![闭环结构 CAN 网络](./can-protocol-images/deaba07fbb44ac123c89e3857305ff7d.webp)
+![闭环结构 CAN 网络](deaba07fbb44ac123c89e3857305ff7d.webp)
 
-![开环结构 CAN 网络](./can-protocol-images/746c932557c833f55f3f43fd421e01c1.webp)
+![开环结构 CAN 网络](746c932557c833f55f3f43fd421e01c1.webp)
 
-![双绞线类型](./can-protocol-images/9158dbe9c2ece9aef799eafff9db3ca8.webp)
+![双绞线类型](9158dbe9c2ece9aef799eafff9db3ca8.webp)
 
-![显性/隐性电平](./can-protocol-images/3061a0decc093dcceecebf3511bde527.webp)
+![显性/隐性电平](3061a0decc093dcceecebf3511bde527.webp)
 
-![ISO11898 与 ISO11519-2 物理层差异](./can-protocol-images/4606360064436ae894169c0fb29c5cb9.webp)
+![ISO11898 与 ISO11519-2 物理层差异](4606360064436ae894169c0fb29c5cb9.webp)
 
-![节点组成示意](./can-protocol-images/7716371960428c034f040d829b202c43.webp)
+![节点组成示意](7716371960428c034f040d829b202c43.webp)
 
 ### 2.2 高速 CAN 与低速 CAN
 
@@ -92,7 +93,7 @@ CAN 没有独立时钟线，节点依赖统一位时序配置实现同步。
 - `NBT = (SYNC_SEG + BS1 + BS2)`
 - 其中 `SYNC_SEG` 通常为 1 Tq
 
-![位时序示意](./can-protocol-images/8669a7a3f3d696b5f6f56fe765b35959.webp)
+![位时序示意](8669a7a3f3d696b5f6f56fe765b35959.webp)
 
 ### 4.2 采样与重同步
 
@@ -104,23 +105,23 @@ CAN 没有独立时钟线，节点依赖统一位时序配置实现同步。
 
 ### 5.1 OSI 对应关系
 
-![ISO/OSI 基本参照模型](./can-protocol-images/4a5b2f1716d28d3f584abdeea46be35e.webp)
+![ISO/OSI 基本参照模型](4a5b2f1716d28d3f584abdeea46be35e.webp)
 
-![CAN 在 OSI 中的分层定义](./can-protocol-images/8e6f10f0ee25475fee150fa27269ea49.webp)
+![CAN 在 OSI 中的分层定义](8e6f10f0ee25475fee150fa27269ea49.webp)
 
 ### 5.2 ISO 标准化版本
 
-![CAN 协议与 ISO11898/ISO11519-2 范围](./can-protocol-images/22d573088c38bbb858d0ee43ea138283.webp)
+![CAN 协议与 ISO11898/ISO11519-2 范围](22d573088c38bbb858d0ee43ea138283.webp)
 
-![物理层子层差异示意](./can-protocol-images/899a8c286fcea7b90deb04a9a40c2fb4.webp)
+![物理层子层差异示意](899a8c286fcea7b90deb04a9a40c2fb4.webp)
 
-![物理层差异对照表](./can-protocol-images/c554afd22f95c244f835660ca00f8b6e.webp)
+![物理层差异对照表](c554afd22f95c244f835660ca00f8b6e.webp)
 
 ### 5.3 其他标准规范
 
-![CAN 相关标准规格](./can-protocol-images/1dcd6872aa4005649836cd73b48c22f9.webp)
+![CAN 相关标准规格](1dcd6872aa4005649836cd73b48c22f9.webp)
 
-![车载协议按速率分类](./can-protocol-images/1fbdafea9ea4ee26b61dc805995fc9ec.webp)
+![车载协议按速率分类](1fbdafea9ea4ee26b61dc805995fc9ec.webp)
 
 ## 6. CAN 帧类型与数据帧字段
 
@@ -139,15 +140,15 @@ CAN 通信围绕 5 类帧：
 - 标准格式：11 位 ID
 - 扩展格式：29 位 ID
 
-![数据帧](./can-protocol-images/aa48abfb39c952e5a31b3726c1990210.webp)
+![数据帧](aa48abfb39c952e5a31b3726c1990210.webp)
 
-![远程帧](./can-protocol-images/9de4b0d45380e61bf441e92352d45a60.webp)
+![远程帧](9de4b0d45380e61bf441e92352d45a60.webp)
 
-![错误帧](./can-protocol-images/701bf29eda70a93d2306a2a57db4630e.webp)
+![错误帧](701bf29eda70a93d2306a2a57db4630e.webp)
 
-![过载帧](./can-protocol-images/936c070ac077efd5af0c85a4e8ee0f5b.webp)
+![过载帧](936c070ac077efd5af0c85a4e8ee0f5b.webp)
 
-![帧间隔](./can-protocol-images/717e77946f263d6f6858cdf0da850bee.webp)
+![帧间隔](717e77946f263d6f6858cdf0da850bee.webp)
 
 ### 6.2 数据帧逐字段拆解（经典 CAN）
 
@@ -161,41 +162,41 @@ CAN 通信围绕 5 类帧：
 6. `ACK 段`：ACK Slot + ACK Delimiter
 7. `EOF`：帧结束（7 位隐性）
 
-![数据帧总览](./can-protocol-images/21e1fcd41b8eab191f44ef8b7c144d36.webp)
+![数据帧总览](21e1fcd41b8eab191f44ef8b7c144d36.webp)
 
-![SOF（标准格式）](./can-protocol-images/3085125c797fbed8cf869f94ee9edde1.webp)
+![SOF（标准格式）](3085125c797fbed8cf869f94ee9edde1.webp)
 
-![SOF（扩展格式）](./can-protocol-images/89ef7dc471d8a16ec180285004aad19a.webp)
+![SOF（扩展格式）](89ef7dc471d8a16ec180285004aad19a.webp)
 
-![仲裁段](./can-protocol-images/bcb41a4b3d97eb5840bb83f44780513c.webp)
+![仲裁段](bcb41a4b3d97eb5840bb83f44780513c.webp)
 
-![控制段（标准）](./can-protocol-images/d3e204eb50fc9d932c15fc9137ad49ba.webp)
+![控制段（标准）](d3e204eb50fc9d932c15fc9137ad49ba.webp)
 
-![控制段（扩展）](./can-protocol-images/67d982f76438b253f3307a29a385c02d.webp)
+![控制段（扩展）](67d982f76438b253f3307a29a385c02d.webp)
 
-![数据段](./can-protocol-images/b4c1b83f97510523a256f9030e9c930c.webp)
+![数据段](b4c1b83f97510523a256f9030e9c930c.webp)
 
-![CRC 段](./can-protocol-images/d2e22621b46ef0672e5a2501b59b0445.webp)
+![CRC 段](d2e22621b46ef0672e5a2501b59b0445.webp)
 
-![ACK 段](./can-protocol-images/16a02afbeea305c3ddb5fb04e45fac2a.webp)
+![ACK 段](16a02afbeea305c3ddb5fb04e45fac2a.webp)
 
-![EOF 段](./can-protocol-images/f8e68e5daa18c32003758383e207d710.webp)
+![EOF 段](f8e68e5daa18c32003758383e207d710.webp)
 
 ### 6.3 远程帧、错误帧、过载帧与帧间隔
 
-![远程帧结构图 1](./can-protocol-images/9a14852ebfc55ec32f180c357edd34d0.webp)
+![远程帧结构图 1](9a14852ebfc55ec32f180c357edd34d0.webp)
 
-![远程帧结构图 2](./can-protocol-images/967d93cc179ee7c352d5ed333b7d6bc7.webp)
+![远程帧结构图 2](967d93cc179ee7c352d5ed333b7d6bc7.webp)
 
-![远程帧结构图 3](./can-protocol-images/4d4b88bb17060c9b016d83200dce7f0e.webp)
+![远程帧结构图 3](4d4b88bb17060c9b016d83200dce7f0e.webp)
 
-![远程帧结构图 4](./can-protocol-images/e0cf0ff1b9ac735eab596b1313c6fdc2.webp)
+![远程帧结构图 4](e0cf0ff1b9ac735eab596b1313c6fdc2.webp)
 
-![错误帧结构](./can-protocol-images/87c27b641013386ba7b6fb50505e4956.webp)
+![错误帧结构](87c27b641013386ba7b6fb50505e4956.webp)
 
-![过载帧结构](./can-protocol-images/26d3cb966838b749fbe7bf8c231128b7.webp)
+![过载帧结构](26d3cb966838b749fbe7bf8c231128b7.webp)
 
-![帧间隔结构](./can-protocol-images/482d32d0373149ee94edb08b6d496ac9.webp)
+![帧间隔结构](482d32d0373149ee94edb08b6d496ac9.webp)
 
 ## 7. 仲裁、优先级与同步
 
@@ -212,11 +213,11 @@ CAN 使用位级非破坏仲裁：
 - 同 ID 下，数据帧优先于远程帧（RTR 位差异）
 - 标准帧与扩展帧竞争时，标准帧通常优先（IDE 位差异）
 
-![仲裁过程示意](./can-protocol-images/b29386759212dfdf427e4fcd369241be.webp)
+![仲裁过程示意](b29386759212dfdf427e4fcd369241be.webp)
 
-![数据帧与远程帧优先级](./can-protocol-images/264137f49d791a968020cd46612b3a01.webp)
+![数据帧与远程帧优先级](264137f49d791a968020cd46612b3a01.webp)
 
-![标准帧与扩展帧优先级](./can-protocol-images/4e66a220cce86563cc93c7a2846cc707.webp)
+![标准帧与扩展帧优先级](4e66a220cce86563cc93c7a2846cc707.webp)
 
 ### 7.2 错误类型与错误帧
 
@@ -235,9 +236,9 @@ CAN 典型错误包括：
 
 这套机制保证了“错误可快速扩散并触发重发”，是 CAN 高可靠性的关键。
 
-![错误类型对照](./can-protocol-images/f8e51c162f54e385efd384854859a863.webp)
+![错误类型对照](f8e51c162f54e385efd384854859a863.webp)
 
-![错误帧输出时序](./can-protocol-images/1b4b26dcc6a1f0ddcedc348f5a0d7a50.webp)
+![错误帧输出时序](1b4b26dcc6a1f0ddcedc348f5a0d7a50.webp)
 
 ### 7.3 同步机制
 
@@ -246,13 +247,13 @@ CAN 典型错误包括：
 
 目标都是让各节点在存在时钟偏差与链路延迟时，仍能稳定采样。
 
-![位时序分段](./can-protocol-images/ba61b735e009c0f941e1e4492d1fe10b.webp)
+![位时序分段](ba61b735e009c0f941e1e4492d1fe10b.webp)
 
-![一个位的组成](./can-protocol-images/2d04b56993bc1a9c0a0cf0fe807915fc.webp)
+![一个位的组成](2d04b56993bc1a9c0a0cf0fe807915fc.webp)
 
-![硬同步示意](./can-protocol-images/a57294ebe57f7d44430291db6f665ff2.webp)
+![硬同步示意](a57294ebe57f7d44430291db6f665ff2.webp)
 
-![再同步示意](./can-protocol-images/04131755ca035f76d51b8ca4c5e9c4ff.webp)
+![再同步示意](04131755ca035f76d51b8ca4c5e9c4ff.webp)
 
 ## 8. 工程实践建议
 
