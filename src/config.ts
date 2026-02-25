@@ -606,7 +606,7 @@ export const sakuraConfig: SakuraConfig = {
 // Pio 看板娘配置
 export const pioConfig: import("./types/config").PioConfig = {
 	enable: true, // 启用看板娘
-	models: ["/pio/models/pio/model.json"], // 默认模型路径
+	models: ["/pio/models/pio/model.json", "/pio/models/umaru/model.json"], // 可切换模型路径
 	position: "left", // 模型位置
 	// 若需统一调整看板娘尺寸，可修改下方的 PIO_SCALE（例如 0.7 表示缩小为原来的 70%）
 	// 注意：如果你希望在多个地方复用该缩放值，可将常量提升到文件顶部
@@ -623,7 +623,7 @@ export const pioConfig: import("./types/config").PioConfig = {
 			"不要这样欺负我！",
 		], // 触摸提示
 		home: "点击这里就可以返回主页啦!", // 首页提示
-		skin: ["Want to see my new outfit?", "The new outfit looks great~"], // 换装提示
+		skin: ["变身!", "这套新衣服真好看~"], // 换装提示
 		close: "QWQ 要下次再见了吗~", // 关闭提示
 		link: "https://github.com/matsuzaka-yuki/Mizuki", // 关于链接
 	},
@@ -642,3 +642,4 @@ export const widgetConfigs = {
 } as const;
 
 // umamiConfig相关配置已移动至astro.config.mjs中,统计脚本请自行在Layout.astro文件的<head>中插入
+
