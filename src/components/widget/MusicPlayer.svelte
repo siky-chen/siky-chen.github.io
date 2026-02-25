@@ -259,8 +259,9 @@ function loadSong(song: typeof currentSong) {
 
 // 标记是否因浏览器策略导致自动播放失败
 let autoplayFailed = false;
-// 标记用户是否已进行过交互（仅交互后自动播放）
-let userActivated = false;
+// 仅在首次用户交互后触发一次自动播放，避免后续点击打断手动暂停
+let interactionInitialized = false;
+let pendingInteractionAutoplay = false;
 
 function handleLoadSuccess() {
 	isLoading = false;
@@ -270,29 +271,40 @@ function handleLoadSuccess() {
 		currentSong.duration = duration;
 	}
 
-	if (willAutoPlay || isPlaying || userActivated) {
+	if (willAutoPlay || isPlaying || pendingInteractionAutoplay) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-                console.warn("自动播放被拦截，等待用户交互:", error);
-                autoplayFailed = true;
-				isPlaying = false;
-            });
+            playPromise
+				.then(() => {
+					autoplayFailed = false;
+					pendingInteractionAutoplay = false;
+				})
+				.catch((error) => {
+					console.warn("自动播放被拦截，等待用户交互:", error);
+					autoplayFailed = true;
+					isPlaying = false;
+				});
 		}
     }
 }
 
 function handleUserInteraction() {
-    userActivated = true;
+	if (!interactionInitialized) {
+		interactionInitialized = true;
+		pendingInteractionAutoplay = true;
+	}
 
-    if (audio && currentSong.url) {
+	if ((pendingInteractionAutoplay || autoplayFailed) && audio && currentSong.url && !isPlaying) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
-            playPromise.then(() => {
-                autoplayFailed = false;
-            }).catch(() => {});
+			playPromise
+				.then(() => {
+					autoplayFailed = false;
+					pendingInteractionAutoplay = false;
+				})
+				.catch(() => {});
 		}
-    }
+	}
 }
 
 function handleLoadError(_event: Event) {
