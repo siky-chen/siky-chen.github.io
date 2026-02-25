@@ -1,17 +1,14 @@
 ---
 title: "CAN 协议详解：从物理层到帧仲裁与错误处理"
-published: 2024-02-25
+published: 2024-02-22
 draft: false
-description: "结合 CAN 总线常见规范，系统梳理 CAN 的结构、位时序、帧格式、仲裁规则与错误处理机制"
+description: "系统梳理 CAN 的结构、位时序、帧格式、仲裁规则与错误处理机制"
 image: "25de04036efded0cdf0233dfe3b627cb.webp"
 category: "嵌入式"
-tags: ["CAN", "驱动", "通信协议", "STM32", "总线"]
+tags: ["CAN", "驱动","通信协议"]
 ---
 
 # CAN 协议详解：从物理层到帧仲裁与错误处理
-
-
-![封面图](25de04036efded0cdf0233dfe3b627cb.webp)
 
 ## 1. CAN 是什么
 
