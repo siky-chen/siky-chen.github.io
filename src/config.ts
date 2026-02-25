@@ -119,20 +119,20 @@ export const siteConfig: SiteConfig = {
 		// 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播
 		src: {
 			desktop: [
-				"/assets/desktop-banner/1.jpeg",
-				"/assets/desktop-banner/2.jpeg",
-				"/assets/desktop-banner/3.jpeg",
-				"/assets/desktop-banner/4.jpeg",
-				"/assets/desktop-banner/5.jpeg",
-				"/assets/desktop-banner/6.jpeg",
+				"/assets/desktop-banner/1.webp",
+				"/assets/desktop-banner/2.webp",
+				"/assets/desktop-banner/3.webp",
+				"/assets/desktop-banner/4.webp",
+				"/assets/desktop-banner/5.webp",
+				"/assets/desktop-banner/6.webp",
 			], // 桌面横幅图片
 			mobile: [
-				"/assets/mobile-banner/1.jpeg",
-				"/assets/mobile-banner/2.jpeg",
-				"/assets/mobile-banner/3.jpeg",
-				"/assets/mobile-banner/4.jpeg",
-				"/assets/mobile-banner/5.jpeg",
-				"/assets/mobile-banner/6.jpeg",
+				"/assets/mobile-banner/1.webp",
+				"/assets/mobile-banner/2.webp",
+				"/assets/mobile-banner/3.webp",
+				"/assets/mobile-banner/4.webp",
+				"/assets/mobile-banner/5.webp",
+				"/assets/mobile-banner/6.webp",
 			], // 移动横幅图片
 		}, // 使用本地横幅图片
 
@@ -230,20 +230,20 @@ export const siteConfig: SiteConfig = {
 export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 	src: {
 		desktop: [
-			"/assets/desktop-banner/1.jpeg",
-			"/assets/desktop-banner/2.jpeg",
-			"/assets/desktop-banner/3.jpeg",
-			"/assets/desktop-banner/4.jpeg",
-			"/assets/desktop-banner/5.jpeg",
-			"/assets/desktop-banner/6.jpeg",
+			"/assets/desktop-banner/1.webp",
+			"/assets/desktop-banner/2.webp",
+			"/assets/desktop-banner/3.webp",
+			"/assets/desktop-banner/4.webp",
+			"/assets/desktop-banner/5.webp",
+			"/assets/desktop-banner/6.webp",
 		], // 桌面横幅图片
 		mobile: [
-			"/assets/mobile-banner/1.jpeg",
-			"/assets/mobile-banner/2.jpeg",
-			"/assets/mobile-banner/3.jpeg",
-			"/assets/mobile-banner/4.jpeg",
-			"/assets/mobile-banner/5.jpeg",
-			"/assets/mobile-banner/6.jpeg",
+			"/assets/mobile-banner/1.webp",
+			"/assets/mobile-banner/2.webp",
+			"/assets/mobile-banner/3.webp",
+			"/assets/mobile-banner/4.webp",
+			"/assets/mobile-banner/5.webp",
+			"/assets/mobile-banner/6.webp",
 		], // 移动横幅图片
 	}, // 使用本地横幅图片
 	position: "top", // 壁纸位置，等同于 object-position
