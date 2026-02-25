@@ -375,6 +375,11 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa7-brands:github",
 			url: "https://github.com/siky-chen",
 		},
+		{
+			name: "Email",
+			icon: "fa7-regular:envelope",
+			url: "mailto:chensiqi0711@outlook.com",
+		},
 	],
 };
 
@@ -637,4 +642,3 @@ export const widgetConfigs = {
 } as const;
 
 // umamiConfig相关配置已移动至astro.config.mjs中,统计脚本请自行在Layout.astro文件的<head>中插入
-
