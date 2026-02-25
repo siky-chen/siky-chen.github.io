@@ -259,6 +259,8 @@ function loadSong(song: typeof currentSong) {
 
 // 标记是否因浏览器策略导致自动播放失败
 let autoplayFailed = false;
+// 标记用户是否已进行过交互（仅交互后自动播放）
+let userActivated = false;
 
 function handleLoadSuccess() {
 	isLoading = false;
@@ -268,7 +270,7 @@ function handleLoadSuccess() {
 		currentSong.duration = duration;
 	}
 
-	if (willAutoPlay || isPlaying) {
+	if (willAutoPlay || isPlaying || userActivated) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
             playPromise.catch((error) => {
@@ -281,7 +283,9 @@ function handleLoadSuccess() {
 }
 
 function handleUserInteraction() {
-    if (autoplayFailed && audio) {
+    userActivated = true;
+
+    if (audio && currentSong.url) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
             playPromise.then(() => {
