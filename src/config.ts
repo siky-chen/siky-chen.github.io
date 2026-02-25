@@ -280,7 +280,7 @@ export const navBarConfig: NavBarConfig = {
 				},
 				{
 					name: "Gitee",
-					url: "https://gitee.com/matsuzakayuki/Mizuki",
+					url: "https://gitee.com/chensiqi0711",
 					external: true,
 					icon: "mdi:git",
 				},
