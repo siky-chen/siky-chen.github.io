@@ -59,6 +59,27 @@ html {
 	}
 }
 
+/* Pusheen custom cursors */
+html,
+body {
+  cursor:
+    url("/assets/cursors/pusheen/cursor-xxxs.png") 1 0,
+    auto;
+}
+
+a,
+button,
+[role="button"],
+summary,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+label[for] {
+  cursor:
+    url("/assets/cursors/pusheen/pointer-xxxs.png") 1 1,
+    pointer;
+}
+
 /* 页面顶部渐变高光效果 */
 .top-gradient-highlight {
   position: fixed;
