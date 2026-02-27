@@ -18,6 +18,19 @@ tags: ["CAN XL", "CAN FD", "通信协议"]
 
 CAN XL 的定位不是推翻 CAN 生态，而是在复用既有布线和工程经验的前提下，向更大载荷、更高吞吐和更强协议扩展能力迈进一步。
 
+## 相关视频
+
+<iframe
+  width="100%"
+  height="468"
+  src="//player.bilibili.com/player.html?bvid=BV1av411e7Xg&p=1&autoplay=0"
+  scrolling="no"
+  border="0"
+  frameborder="no"
+  framespacing="0"
+  allowfullscreen="true"
+></iframe>
+
 ## 1. 传统 CAN 的现实瓶颈
 
 ### 1.1 容量瓶颈
@@ -88,4 +101,3 @@ CAN XL 的价值不只在 2048 字节，更在于它把 CAN 生态向下一代�
 - 为和以太网协同提供更清晰的中间层
 
 当项目同时面临“带宽增长、成本约束、迁移风险”三重压力时，CAN XL 往往是比“全量以太网化”更务实的一步。
-
