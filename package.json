@@ -42,7 +42,7 @@
 		"@iconify-json/material-symbols": "^1.2.53",
 		"@iconify-json/simple-icons": "^1.2.69",
 		"@iconify/svelte": "^4.2.0",
-		"@swup/astro": "^1.7.0",
+		"@swup/astro": "^1.8.0",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.0",
 		"astro": "5.17.1",
@@ -75,10 +75,10 @@
 		"satori": "^0.19.1",
 		"sharp": "^0.34.5",
 		"stylus": "^0.64.0",
-		"svelte": "^5.46.1",
+		"svelte": "^5.53.3",
 		"tailwindcss": "^4.2.0",
 		"typescript": "^5.9.3",
-		"unist-util-visit": "^5.0.0"
+		"unist-util-visit": "^5.1.0"
 	},
 	"devDependencies": {
 		"@astrojs/ts-plugin": "^1.10.6",

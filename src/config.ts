@@ -23,7 +23,7 @@ const SITE_LANG = "zh_CN"; // 语言代码，例如：'en', 'zh_CN', 'ja' 等。
 const SITE_TIMEZONE = 8; //设置你的网站时区 from -12 to 12 default in UTC+8
 export const siteConfig: SiteConfig = {
 	title: "Siky",
-	subtitle: "Siky Blog",
+	subtitle: "This is Siky's blog",
 	siteURL: "https://siky-chen.github.io/", // 请替换为你的站点URL，以斜杠结尾
 	siteStartDate: "2025-01-01", // 站点开始运行日期，用于站点统计组件计算运行天数
 
@@ -73,7 +73,7 @@ export const siteConfig: SiteConfig = {
 
 	bilibili: {
 		vmid: "37511201", // 在此处设置你的Bilibili用户ID (uid)，例如 "1129280784"
-		fetchOnDev: false, // 是否在开发环境下获取 Bilibili 数据（默认 false）
+		fetchOnDev: true, // 是否在开发环境下获取 Bilibili 数据（默认 false）
 		coverMirror: "", // 封面图片镜像源（可选，如果需要使用镜像源，例如 "https://images.weserv.nl/?url="）
 		useWebp: true, // 是否使用WebP格式（默认 true）
 
@@ -85,7 +85,7 @@ export const siteConfig: SiteConfig = {
 	},
 
 	anime: {
-		mode: "local", // 番剧页面模式："bangumi" 使用Bangumi API，"local" 使用本地配置，"bilibili" 使用Bilibili API
+		mode: "bilibili", // 番剧页面模式："bangumi" 使用Bangumi API，"local" 使用本地配置，"bilibili" 使用Bilibili API
 	},
 
 	// 文章列表布局配置
@@ -119,20 +119,20 @@ export const siteConfig: SiteConfig = {
 		// 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播
 		src: {
 			desktop: [
-				"/assets/desktop-banner/1.jpeg",
-				"/assets/desktop-banner/2.jpeg",
-				"/assets/desktop-banner/3.jpeg",
-				"/assets/desktop-banner/4.jpeg",
-				"/assets/desktop-banner/5.jpeg",
-				"/assets/desktop-banner/6.jpeg",
+				"/assets/desktop-banner/1.webp",
+				"/assets/desktop-banner/2.webp",
+				"/assets/desktop-banner/3.webp",
+				"/assets/desktop-banner/4.webp",
+				"/assets/desktop-banner/5.webp",
+				"/assets/desktop-banner/6.webp",
 			], // 桌面横幅图片
 			mobile: [
-				"/assets/mobile-banner/1.jpeg",
-				"/assets/mobile-banner/2.jpeg",
-				"/assets/mobile-banner/3.jpeg",
-				"/assets/mobile-banner/4.jpeg",
-				"/assets/mobile-banner/5.jpeg",
-				"/assets/mobile-banner/6.jpeg",
+				"/assets/mobile-banner/1.webp",
+				"/assets/mobile-banner/2.webp",
+				"/assets/mobile-banner/3.webp",
+				"/assets/mobile-banner/4.webp",
+				"/assets/mobile-banner/5.webp",
+				"/assets/mobile-banner/6.webp",
 			], // 移动横幅图片
 		}, // 使用本地横幅图片
 
@@ -163,10 +163,12 @@ export const siteConfig: SiteConfig = {
 			title: "你好，我是Siky", // 主页横幅主标题
 
 			subtitle: [
-				"做你觉得对的事，然后接受它的事与愿违",
-				"疲倦的生活，总要有些温柔的梦想",
-				"在心里种花，人生才不会荒芜",
-				"最好的状态就是，一点点向喜欢的东西靠近",
+			"竹杖芒鞋轻胜马，一蓑烟雨任平生",
+			"莫听穿林打叶声，何妨吟啸且徐行",
+			"人生如逆旅，我亦是行人",
+			"且将新火试新茶，诗酒趁年华",
+			"长风破浪会有时，直挂云帆济沧海",
+			"仰天大笑出门去，我辈岂是蓬蒿人"
 			],
 			typewriter: {
 				enable: true, // 启用副标题打字机效果
@@ -230,20 +232,20 @@ export const siteConfig: SiteConfig = {
 export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 	src: {
 		desktop: [
-			"/assets/desktop-banner/1.jpeg",
-			"/assets/desktop-banner/2.jpeg",
-			"/assets/desktop-banner/3.jpeg",
-			"/assets/desktop-banner/4.jpeg",
-			"/assets/desktop-banner/5.jpeg",
-			"/assets/desktop-banner/6.jpeg",
+			"/assets/desktop-banner/1.webp",
+			"/assets/desktop-banner/2.webp",
+			"/assets/desktop-banner/3.webp",
+			"/assets/desktop-banner/4.webp",
+			"/assets/desktop-banner/5.webp",
+			"/assets/desktop-banner/6.webp",
 		], // 桌面横幅图片
 		mobile: [
-			"/assets/mobile-banner/1.jpeg",
-			"/assets/mobile-banner/2.jpeg",
-			"/assets/mobile-banner/3.jpeg",
-			"/assets/mobile-banner/4.jpeg",
-			"/assets/mobile-banner/5.jpeg",
-			"/assets/mobile-banner/6.jpeg",
+			"/assets/mobile-banner/1.webp",
+			"/assets/mobile-banner/2.webp",
+			"/assets/mobile-banner/3.webp",
+			"/assets/mobile-banner/4.webp",
+			"/assets/mobile-banner/5.webp",
+			"/assets/mobile-banner/6.webp",
 		], // 移动横幅图片
 	}, // 使用本地横幅图片
 	position: "top", // 壁纸位置，等同于 object-position
@@ -357,7 +359,7 @@ export const navBarConfig: NavBarConfig = {
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/siky.png", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
+	avatar: "assets/images/siky.webp", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
 	name: "Siky", // 昵称
 	bio: "这个世界很大❤️",
 	typewriter: {
@@ -374,6 +376,11 @@ export const profileConfig: ProfileConfig = {
 			name: "GitHub",
 			icon: "fa7-brands:github",
 			url: "https://github.com/siky-chen",
+		},
+		{
+			name: "Email",
+			icon: "fa7-regular:envelope",
+			url: "mailto:chensiqi0711@outlook.com",
 		},
 	],
 };
@@ -585,14 +592,14 @@ export const sakuraConfig: SakuraConfig = {
 	},
 	speed: {
 		horizontal: {
-			min: -1.7, // 水平移动速度最小值
-			max: -1.2, // 水平移动速度最大值
+			min: -1.2, // 水平移动速度最小值
+			max: -0.8, // 水平移动速度最大值
 		},
 		vertical: {
-			min: 1.5, // 垂直移动速度最小值
-			max: 2.2, // 垂直移动速度最大值
+			min: 0.9, // 垂直移动速度最小值
+			max: 1.4, // 垂直移动速度最大值
 		},
-		rotation: 0.03, // 旋转速度
+		rotation: 0.02, // 旋转速度
 		fadeSpeed: 0.03, // 消失速度，不应大于最小不透明度
 	},
 	zIndex: 100, // 层级，确保樱花在合适的层级显示
@@ -601,7 +608,7 @@ export const sakuraConfig: SakuraConfig = {
 // Pio 看板娘配置
 export const pioConfig: import("./types/config").PioConfig = {
 	enable: true, // 启用看板娘
-	models: ["/pio/models/pio/model.json"], // 默认模型路径
+	models: ["/pio/models/pio/model.json", "/pio/models/umaru/model.json"], // 可切换模型路径
 	position: "left", // 模型位置
 	// 若需统一调整看板娘尺寸，可修改下方的 PIO_SCALE（例如 0.7 表示缩小为原来的 70%）
 	// 注意：如果你希望在多个地方复用该缩放值，可将常量提升到文件顶部
@@ -618,7 +625,7 @@ export const pioConfig: import("./types/config").PioConfig = {
 			"不要这样欺负我！",
 		], // 触摸提示
 		home: "点击这里就可以返回主页啦!", // 首页提示
-		skin: ["Want to see my new outfit?", "The new outfit looks great~"], // 换装提示
+		skin: ["变身!", "这套新衣服真好看~"], // 换装提示
 		close: "QWQ 要下次再见了吗~", // 关闭提示
 		link: "https://github.com/matsuzaka-yuki/Mizuki", // 关于链接
 	},
@@ -637,4 +644,3 @@ export const widgetConfigs = {
 } as const;
 
 // umamiConfig相关配置已移动至astro.config.mjs中,统计脚本请自行在Layout.astro文件的<head>中插入
-

@@ -259,6 +259,9 @@ function loadSong(song: typeof currentSong) {
 
 // 标记是否因浏览器策略导致自动播放失败
 let autoplayFailed = false;
+// 仅在首次用户交互后触发一次自动播放，避免后续点击打断手动暂停
+let interactionInitialized = false;
+let pendingInteractionAutoplay = false;
 
 function handleLoadSuccess() {
 	isLoading = false;
@@ -268,27 +271,40 @@ function handleLoadSuccess() {
 		currentSong.duration = duration;
 	}
 
-	if (willAutoPlay || isPlaying) {
+	if (willAutoPlay || isPlaying || pendingInteractionAutoplay) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-                console.warn("自动播放被拦截，等待用户交互:", error);
-                autoplayFailed = true;
-				isPlaying = false;
-            });
+            playPromise
+				.then(() => {
+					autoplayFailed = false;
+					pendingInteractionAutoplay = false;
+				})
+				.catch((error) => {
+					console.warn("自动播放被拦截，等待用户交互:", error);
+					autoplayFailed = true;
+					isPlaying = false;
+				});
 		}
     }
 }
 
 function handleUserInteraction() {
-    if (autoplayFailed && audio) {
+	if (!interactionInitialized) {
+		interactionInitialized = true;
+		pendingInteractionAutoplay = true;
+	}
+
+	if ((pendingInteractionAutoplay || autoplayFailed) && audio && currentSong.url && !isPlaying) {
         const playPromise = audio.play();
 		if (playPromise !== undefined) {
-            playPromise.then(() => {
-                autoplayFailed = false;
-            }).catch(() => {});
+			playPromise
+				.then(() => {
+					autoplayFailed = false;
+					pendingInteractionAutoplay = false;
+				})
+				.catch(() => {});
 		}
-    }
+	}
 }
 
 function handleLoadError(_event: Event) {
