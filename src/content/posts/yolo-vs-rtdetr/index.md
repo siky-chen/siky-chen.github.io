@@ -49,12 +49,15 @@ lang: ""
 - 通过结构优化降低计算成本，目标是在保持较好精度的同时实现实时检测
 - 既保留了 `DETR` 系列统一预测的优点，又比经典 `DETR` 更适合部署到实际业务场景
 
-<video
+<iframe
   width="100%"
-  controls
-  preload="metadata"
-  src="./rtdetr-ultralytics-demo.mp4"
-></video>
+  height="468"
+  src="https://www.youtube.com/embed/i70ecEGB1ro?rel=0"
+  title="How to Use Baidu's RT-DETR for Object Detection | Inference and Benchmarking with Ultralytics"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen
+></iframe>
 
 视频来源：[`How to Use Baidu's RT-DETR for Object Detection | Inference and Benchmarking with Ultralytics`](https://youtu.be/i70ecEGB1ro)
 
