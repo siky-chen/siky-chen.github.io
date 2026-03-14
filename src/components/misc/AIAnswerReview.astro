@@ -1,0 +1,622 @@
+---
+interface Props {
+	articleTitle: string;
+	apiUrl?: string;
+}
+
+const {
+	articleTitle,
+	apiUrl = import.meta.env.PUBLIC_AI_REVIEW_API_URL || "/api/evaluate-answer",
+} = Astro.props;
+---
+
+<div
+	id="ai-answer-review-root"
+	data-article-title={articleTitle}
+	data-api-url={apiUrl}
+></div>
+
+<script is:inline>
+(() => {
+	const w = window;
+	const BOOTSTRAP_KEY = "__aiAnswerReviewBootstrapped";
+
+	function createTextElement(tag, className, text) {
+		const element = document.createElement(tag);
+		if (className) element.className = className;
+		if (text) element.textContent = text;
+		return element;
+	}
+
+	function normalizeText(text) {
+		return (text || "").replace(/\s+/g, " ").trim();
+	}
+
+	function escapeStorageKey(text) {
+		return encodeURIComponent(text).slice(0, 160);
+	}
+
+	function getRootConfig() {
+		const root = document.getElementById("ai-answer-review-root");
+		if (!root) return null;
+
+		return {
+			apiUrl: root.dataset.apiUrl || "/api/evaluate-answer",
+			articleTitle: root.dataset.articleTitle || "",
+		};
+	}
+
+	function getContentContainers() {
+		const containers = Array.from(
+			document.querySelectorAll(".markdown-content.custom-md, #decrypted-content"),
+		).filter((node) => node instanceof HTMLElement);
+
+		return containers.filter((container) => {
+			return !containers.some((other) => {
+				return other !== container && other.contains(container);
+			});
+		});
+	}
+
+	function extractReferenceAnswer(details) {
+		if (!(details instanceof HTMLDetailsElement)) return "";
+
+		const clone = details.cloneNode(true);
+		const summary = clone.querySelector("summary");
+		if (summary) {
+			summary.remove();
+		}
+		return normalizeText(clone.textContent || "");
+	}
+
+	function getHeadingContext(container, heading) {
+		const headings = Array.from(container.querySelectorAll("h2, h3, h4"));
+		const currentIndex = headings.indexOf(heading);
+		let sectionTitle = "";
+		let subSectionTitle = "";
+
+		for (let i = currentIndex - 1; i >= 0; i -= 1) {
+			const current = headings[i];
+			if (!subSectionTitle && current.tagName === "H3") {
+				subSectionTitle = normalizeText(current.textContent || "");
+			}
+			if (current.tagName === "H2") {
+				sectionTitle = normalizeText(current.textContent || "");
+				break;
+			}
+		}
+
+		return { sectionTitle, subSectionTitle };
+	}
+
+	function buildResultList(title, items) {
+		if (!Array.isArray(items) || items.length === 0) return null;
+
+		const block = createTextElement("div", "ai-answer-review-result-block", "");
+		const heading = createTextElement(
+			"div",
+			"ai-answer-review-result-title",
+			title,
+		);
+		const list = createTextElement("ul", "ai-answer-review-result-list", "");
+
+		items.forEach((item) => {
+			if (!item) return;
+			list.appendChild(createTextElement("li", "", String(item)));
+		});
+
+		block.appendChild(heading);
+		block.appendChild(list);
+		return block;
+	}
+
+	function renderResult(resultNode, data) {
+		resultNode.innerHTML = "";
+		resultNode.hidden = false;
+
+		const summary = createTextElement("div", "ai-answer-review-result-summary", "");
+		const score = createTextElement(
+			"div",
+			"ai-answer-review-score",
+			`${Number(data.score || 0)}/100`,
+		);
+		const verdict = createTextElement(
+			"div",
+			"ai-answer-review-verdict",
+			data.verdict || "已完成评分",
+		);
+		const desc = createTextElement(
+			"p",
+			"ai-answer-review-result-desc",
+			data.summary || "",
+		);
+
+		summary.appendChild(score);
+		summary.appendChild(verdict);
+		resultNode.appendChild(summary);
+		if (desc.textContent) {
+			resultNode.appendChild(desc);
+		}
+
+		const strengths = buildResultList("回答亮点", data.strengths);
+		const improvements = buildResultList("改进建议", data.improvements);
+		const followUps = buildResultList("可能追问", data.followUps);
+
+		if (strengths) resultNode.appendChild(strengths);
+		if (improvements) resultNode.appendChild(improvements);
+
+		if (data.betterAnswer) {
+			const better = createTextElement(
+				"div",
+				"ai-answer-review-result-block",
+				"",
+			);
+			better.appendChild(
+				createTextElement("div", "ai-answer-review-result-title", "优化表达"),
+			);
+			better.appendChild(
+				createTextElement(
+					"p",
+					"ai-answer-review-result-desc ai-answer-review-better-answer",
+					String(data.betterAnswer),
+				),
+			);
+			resultNode.appendChild(better);
+		}
+
+		if (followUps) resultNode.appendChild(followUps);
+	}
+
+	function renderError(resultNode, message) {
+		resultNode.innerHTML = "";
+		resultNode.hidden = false;
+		resultNode.appendChild(
+			createTextElement(
+				"p",
+				"ai-answer-review-error",
+				message || "AI 评分失败，请稍后重试。",
+			),
+		);
+	}
+
+	async function reviewAnswer(config, payload) {
+		const response = await fetch(config.apiUrl, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			let errorMessage = "AI 评分接口暂时不可用。";
+			try {
+				const errorData = await response.json();
+				if (errorData && errorData.error) {
+					errorMessage = String(errorData.error);
+				}
+			} catch {}
+
+			if (response.status === 404) {
+				errorMessage =
+					"没有找到 AI 评分接口。若博客部署在 GitHub Pages，请把 PUBLIC_AI_REVIEW_API_URL 指向你的 Vercel /api/evaluate-answer 地址。";
+			}
+			throw new Error(errorMessage);
+		}
+
+		return response.json();
+	}
+
+	function createPracticeWidget(config, container, heading) {
+		if (!(heading instanceof HTMLHeadingElement)) return;
+		if (heading.dataset.aiReviewEnhanced === "true") return;
+
+		const questionText = normalizeText(heading.textContent || "");
+		if (!/^Q\d+\./i.test(questionText)) return;
+
+		const nextNode = heading.nextElementSibling;
+		const referenceAnswer =
+			nextNode && nextNode.tagName === "DETAILS"
+				? extractReferenceAnswer(nextNode)
+				: "";
+		const { sectionTitle, subSectionTitle } = getHeadingContext(
+			container,
+			heading,
+		);
+
+		const widget = createTextElement("section", "ai-answer-review", "");
+		const topBar = createTextElement("div", "ai-answer-review-topbar", "");
+		const toggleButton = createTextElement(
+			"button",
+			"ai-answer-review-toggle",
+			"开始练习",
+		);
+		toggleButton.type = "button";
+		const hint = createTextElement(
+			"p",
+			"ai-answer-review-hint",
+			"建议先自己作答，再展开参考答案对照。",
+		);
+
+		const panel = createTextElement("div", "ai-answer-review-panel", "");
+		panel.hidden = true;
+
+		const label = createTextElement("label", "ai-answer-review-label", "我的回答");
+		const textarea = document.createElement("textarea");
+		textarea.className = "ai-answer-review-textarea";
+		textarea.placeholder = "把你的回答写在这里，建议按“定义 -> 原理 -> 项目经验”结构回答。";
+		textarea.rows = 6;
+
+		const actionRow = createTextElement("div", "ai-answer-review-actions", "");
+		const scoreButton = createTextElement(
+			"button",
+			"ai-answer-review-button ai-answer-review-button-primary",
+			"AI 评分",
+		);
+		scoreButton.type = "button";
+		const clearButton = createTextElement(
+			"button",
+			"ai-answer-review-button",
+			"清空",
+		);
+		clearButton.type = "button";
+
+		const helper = createTextElement(
+			"p",
+			"ai-answer-review-helper",
+			"评分会结合题目和参考答案，从正确性、完整性、条理和项目结合度几个维度给建议。",
+		);
+		const resultNode = createTextElement("div", "ai-answer-review-result", "");
+		resultNode.hidden = true;
+
+		const storageKey = `ai-answer-review:${window.location.pathname}:${escapeStorageKey(questionText)}`;
+		const savedAnswer = window.localStorage.getItem(storageKey);
+		if (savedAnswer) {
+			textarea.value = savedAnswer;
+		}
+
+		textarea.addEventListener("input", () => {
+			window.localStorage.setItem(storageKey, textarea.value);
+		});
+
+		toggleButton.addEventListener("click", () => {
+			const nextHidden = !panel.hidden;
+			panel.hidden = nextHidden;
+			toggleButton.textContent = nextHidden ? "开始练习" : "收起练习";
+		});
+
+		clearButton.addEventListener("click", () => {
+			textarea.value = "";
+			resultNode.hidden = true;
+			resultNode.innerHTML = "";
+			window.localStorage.removeItem(storageKey);
+		});
+
+		scoreButton.addEventListener("click", async () => {
+			const answer = normalizeText(textarea.value);
+			if (!answer) {
+				renderError(resultNode, "先写一点自己的回答，再让 AI 评分会更有意义。");
+				return;
+			}
+
+			scoreButton.disabled = true;
+			scoreButton.textContent = "评分中...";
+
+			try {
+				const result = await reviewAnswer(config, {
+					articleTitle: config.articleTitle,
+					sectionTitle,
+					subSectionTitle,
+					question: questionText,
+					referenceAnswer,
+					answer,
+				});
+				renderResult(resultNode, result);
+			} catch (error) {
+				const message =
+					error instanceof Error ? error.message : "AI 评分失败，请稍后重试。";
+				renderError(resultNode, message);
+			} finally {
+				scoreButton.disabled = false;
+				scoreButton.textContent = "AI 评分";
+			}
+		});
+
+		topBar.appendChild(toggleButton);
+		topBar.appendChild(hint);
+		actionRow.appendChild(scoreButton);
+		actionRow.appendChild(clearButton);
+
+		panel.appendChild(label);
+		panel.appendChild(textarea);
+		panel.appendChild(actionRow);
+		panel.appendChild(helper);
+		panel.appendChild(resultNode);
+
+		widget.appendChild(topBar);
+		widget.appendChild(panel);
+
+		heading.insertAdjacentElement("afterend", widget);
+		heading.dataset.aiReviewEnhanced = "true";
+	}
+
+	function injectIntroCard(container) {
+		if (!(container instanceof HTMLElement)) return;
+		if (container.dataset.aiReviewIntroAdded === "true") return;
+
+		const firstQuestion = container.querySelector("h4");
+		if (!(firstQuestion instanceof HTMLElement)) return;
+
+		const intro = createTextElement("div", "ai-answer-review-intro", "");
+		intro.appendChild(
+			createTextElement(
+				"strong",
+				"ai-answer-review-intro-title",
+				"练习模式已启用",
+			),
+		);
+		intro.appendChild(
+			createTextElement(
+				"p",
+				"ai-answer-review-intro-desc",
+				"每道题下方都可以点“开始练习”，先写自己的回答，再让 AI 评分并给改进建议。",
+			),
+		);
+
+		firstQuestion.insertAdjacentElement("beforebegin", intro);
+		container.dataset.aiReviewIntroAdded = "true";
+	}
+
+	function enhanceReviewWidgets() {
+		const config = getRootConfig();
+		if (!config) return;
+
+		getContentContainers().forEach((container) => {
+			injectIntroCard(container);
+			Array.from(container.querySelectorAll("h4")).forEach((heading) => {
+				createPracticeWidget(config, container, heading);
+			});
+		});
+	}
+
+	if (!w[BOOTSTRAP_KEY]) {
+		w[BOOTSTRAP_KEY] = true;
+
+		const observer = new MutationObserver(() => {
+			enhanceReviewWidgets();
+		});
+
+		if (document.body) {
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+			});
+		}
+
+		document.addEventListener("DOMContentLoaded", enhanceReviewWidgets);
+		document.addEventListener("astro:after-swap", enhanceReviewWidgets);
+
+		if (w.swup && w.swup.hooks && typeof w.swup.hooks.on === "function") {
+			w.swup.hooks.on("content:replace", enhanceReviewWidgets);
+		}
+	}
+
+	enhanceReviewWidgets();
+})();
+</script>
+
+<style is:global>
+.ai-answer-review-intro {
+	margin: 0 0 1.25rem;
+	padding: 1rem 1rem 0.95rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 22%, var(--line-divider));
+	border-radius: 1rem;
+	background:
+		linear-gradient(135deg, color-mix(in oklch, var(--primary) 8%, transparent), transparent 58%),
+		color-mix(in oklch, var(--card-bg) 92%, var(--primary) 8%);
+}
+
+.ai-answer-review-intro-title {
+	display: block;
+	margin-bottom: 0.35rem;
+	color: var(--primary);
+	font-size: 0.98rem;
+}
+
+.ai-answer-review-intro-desc {
+	margin: 0;
+	font-size: 0.92rem;
+	line-height: 1.6;
+}
+
+.ai-answer-review {
+	margin: 0.95rem 0 1.35rem;
+	padding: 0.9rem 1rem 1rem;
+	border: 1px dashed color-mix(in oklch, var(--primary) 28%, var(--line-divider));
+	border-radius: 1rem;
+	background:
+		linear-gradient(180deg, color-mix(in oklch, var(--primary) 6%, transparent), transparent 72%),
+		color-mix(in oklch, var(--card-bg) 96%, var(--primary) 4%);
+}
+
+.ai-answer-review-topbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	justify-content: space-between;
+}
+
+.ai-answer-review-toggle,
+.ai-answer-review-button {
+	border: 1px solid color-mix(in oklch, var(--primary) 24%, var(--line-divider));
+	border-radius: 999px;
+	padding: 0.5rem 0.95rem;
+	font-size: 0.9rem;
+	line-height: 1.1;
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		border-color 0.18s ease,
+		color 0.18s ease,
+		box-shadow 0.18s ease;
+}
+
+.ai-answer-review-toggle:hover,
+.ai-answer-review-button:hover {
+	transform: translateY(-1px);
+}
+
+.ai-answer-review-toggle {
+	background: color-mix(in oklch, var(--primary) 12%, var(--card-bg));
+	color: var(--primary);
+	font-weight: 600;
+}
+
+.ai-answer-review-hint,
+.ai-answer-review-helper,
+.ai-answer-review-result-desc,
+.ai-answer-review-result-list {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.7;
+}
+
+.ai-answer-review-hint {
+	flex: 1;
+	min-width: 14rem;
+	color: color-mix(in oklch, currentColor 72%, transparent);
+}
+
+.ai-answer-review-panel {
+	margin-top: 0.95rem;
+}
+
+.ai-answer-review-label {
+	display: block;
+	margin-bottom: 0.55rem;
+	font-size: 0.92rem;
+	font-weight: 600;
+}
+
+.ai-answer-review-textarea {
+	width: 100%;
+	min-height: 9rem;
+	padding: 0.9rem 1rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 18%, var(--line-divider));
+	border-radius: 1rem;
+	background: color-mix(in oklch, var(--card-bg) 92%, white 8%);
+	resize: vertical;
+	outline: none;
+	transition:
+		border-color 0.18s ease,
+		box-shadow 0.18s ease,
+		background-color 0.18s ease;
+}
+
+.ai-answer-review-textarea:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 15%, transparent);
+}
+
+.ai-answer-review-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-top: 0.75rem;
+}
+
+.ai-answer-review-button {
+	background: transparent;
+}
+
+.ai-answer-review-button-primary {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: white;
+	font-weight: 600;
+}
+
+.ai-answer-review-button:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.ai-answer-review-helper {
+	margin-top: 0.7rem;
+	color: color-mix(in oklch, currentColor 68%, transparent);
+}
+
+.ai-answer-review-result {
+	margin-top: 0.95rem;
+	padding: 1rem;
+	border-radius: 1rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 16%, var(--line-divider));
+	background: color-mix(in oklch, var(--primary) 6%, var(--card-bg));
+}
+
+.ai-answer-review-result-summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.6rem;
+}
+
+.ai-answer-review-score {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.35rem 0.75rem;
+	border-radius: 999px;
+	background: color-mix(in oklch, var(--primary) 14%, transparent);
+	color: var(--primary);
+	font-weight: 700;
+}
+
+.ai-answer-review-verdict {
+	font-weight: 600;
+}
+
+.ai-answer-review-result-block + .ai-answer-review-result-block {
+	margin-top: 0.8rem;
+}
+
+.ai-answer-review-result-title {
+	margin-bottom: 0.35rem;
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.ai-answer-review-result-list {
+	padding-left: 1.1rem;
+}
+
+.ai-answer-review-better-answer {
+	white-space: pre-wrap;
+}
+
+.ai-answer-review-error {
+	margin: 0;
+	color: #d9485f;
+	font-size: 0.92rem;
+	line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+	.ai-answer-review {
+		padding: 0.85rem 0.85rem 0.95rem;
+	}
+
+	.ai-answer-review-topbar {
+		align-items: flex-start;
+	}
+
+	.ai-answer-review-toggle,
+	.ai-answer-review-button {
+		width: 100%;
+		justify-content: center;
+	}
+}
+</style>

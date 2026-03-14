@@ -608,7 +608,7 @@ export const sakuraConfig: SakuraConfig = {
 // Pio 看板娘配置
 export const pioConfig: import("./types/config").PioConfig = {
 	enable: true, // 启用看板娘
-	models: ["/pio/models/pio/model.json", "/pio/models/umaru/model.json"], // 可切换模型路径
+	models: ["/pio/models/umaru/model.json", "/pio/models/pio/model.json"], // 第一个模型为默认显示模型
 	position: "left", // 模型位置
 	// 若需统一调整看板娘尺寸，可修改下方的 PIO_SCALE（例如 0.7 表示缩小为原来的 70%）
 	// 注意：如果你希望在多个地方复用该缩放值，可将常量提升到文件顶部

@@ -1,6 +1,6 @@
 ---
 title: "CAN XL学习"
-published: 2026-02-27
+published: 2025-02-27
 draft: false
 description: " CAN XL 的帧格式、关键字段"
 category: "嵌入式"
