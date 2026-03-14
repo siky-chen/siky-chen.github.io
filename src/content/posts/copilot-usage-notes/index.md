@@ -493,9 +493,9 @@ Hooks 的本质是：**在 Agent 工作流的某些阶段自动跑脚本。**
 
 ## 参考
 
-- `https://mp.weixin.qq.com/s/2tFnsinqchJrs0jS6sji7w`
 - `https://www.runoob.com/vscode/vscode-github-copilot.html`
 - `https://code.visualstudio.com/docs/copilot/chat/mcp-servers`
+- `https://mp.weixin.qq.com/s/2tFnsinqchJrs0jS6sji7w`
 - `https://github.com/github/github-mcp-server`
 - `https://github.com/microsoft/playwright-mcp`
 - `https://github.com/modelcontextprotocol/servers`
