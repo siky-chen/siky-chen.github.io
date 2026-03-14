@@ -2,7 +2,7 @@
 title: "嵌入式常见问题"
 published: 2024-05-14
 draft: false
-description: "机器人、ROS2、嵌入式、车载与 RAG 方向的面试问题与参考答案。"
+description: "常见知识点"
 category: "嵌入式"
 tags: ["嵌入式"]
 author: "Siky Chen"
