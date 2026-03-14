@@ -1,3 +1,7 @@
+declare const process: {
+	env: Record<string, string | undefined>;
+};
+
 const corsHeaders = {
 	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Headers": "Content-Type",
