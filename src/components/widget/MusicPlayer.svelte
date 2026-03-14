@@ -328,6 +328,7 @@ function handleAudioEnded() {
 		audio.play().catch(() => {});
 	} else if (
 		isRepeating === 2 ||
+		currentIndex < playlist.length - 1 ||
 		isShuffled
 	) {
 		nextSong(true);
