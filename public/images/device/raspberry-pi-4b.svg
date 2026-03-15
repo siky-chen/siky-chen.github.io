@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" fill="none">
+  <rect width="960" height="640" rx="40" fill="#F5F8F4"/>
+  <rect x="130" y="130" width="700" height="380" rx="30" fill="#1F7A45"/>
+  <rect x="180" y="180" width="230" height="180" rx="18" fill="#2FA35F"/>
+  <rect x="438" y="172" width="148" height="148" rx="18" fill="#25343B"/>
+  <rect x="460" y="194" width="104" height="104" rx="12" fill="#50656F"/>
+  <rect x="620" y="180" width="120" height="60" rx="10" fill="#C8D2D8"/>
+  <rect x="620" y="258" width="120" height="60" rx="10" fill="#C8D2D8"/>
+  <rect x="620" y="336" width="120" height="60" rx="10" fill="#C8D2D8"/>
+  <rect x="760" y="190" width="52" height="200" rx="12" fill="#A2B2BA"/>
+  <rect x="190" y="392" width="160" height="34" rx="8" fill="#E6C15A"/>
+  <rect x="370" y="392" width="110" height="34" rx="8" fill="#1C262B"/>
+  <rect x="500" y="392" width="110" height="34" rx="8" fill="#1C262B"/>
+  <rect x="630" y="392" width="110" height="34" rx="8" fill="#1C262B"/>
+  <circle cx="170" cy="170" r="16" fill="#DDE6D9"/>
+  <circle cx="790" cy="170" r="16" fill="#DDE6D9"/>
+  <circle cx="170" cy="470" r="16" fill="#DDE6D9"/>
+  <circle cx="790" cy="470" r="16" fill="#DDE6D9"/>
+  <text x="480" y="570" text-anchor="middle" fill="#1F2A22" font-family="Arial, sans-serif" font-size="42" font-weight="700">
+    Raspberry Pi 4B
+  </text>
+</svg>

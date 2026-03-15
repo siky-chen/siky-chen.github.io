@@ -36,4 +36,14 @@ export const devicesData: DeviceCategory = {
 			link: "https://www.gl-inet.cn/products/gl-mt3000/",
 		},
 	],
+	"Development Board": [
+		{
+			name: "Raspberry Pi 4B",
+			image: "/images/device/raspberry-pi-4b.svg",
+			specs: "4GB RAM / BCM2711 / Quad-Core Cortex-A72",
+			description:
+				"A compact ARM development board suitable for edge services, embedded prototyping, and homelab projects.",
+			link: "https://www.raspberrypi.com/products/raspberry-pi-4-model-b/",
+		},
+	],
 };

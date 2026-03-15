@@ -3,6 +3,7 @@ title: "MCP 开发入门：从协议理解到服务端落地"
 published: 2026-03-15
 draft: false
 description: "从开发者视角理解 MCP，并快速落地一个可用的 MCP Server。"
+image: "image-20250223214308430.webp"
 category: "AI 编程"
 tags: ["Model Context Protocol"]
 author: "Siky Chen"
@@ -26,6 +27,8 @@ author: "Siky Chen"
 2. `Host`、`Client`、`Server` 各自负责什么
 3. 一次 `MCP` 调用链路是怎么跑起来的
 4. 一个 `MCP Server` 应该怎么开发、调试和限权
+
+![MCP 入门示意图](image-20250223214308430.webp)
 
 ## 1. MCP 是什么
 
