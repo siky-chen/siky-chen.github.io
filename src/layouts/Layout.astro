@@ -118,6 +118,8 @@ if (!lang) {
 	lang = `${siteConfig.lang}`;
 }
 const siteLang = lang.replace("_", "-");
+const umamiScriptUrl = import.meta.env.UMAMI_SCRIPT_URL;
+const umamiWebsiteId = import.meta.env.UMAMI_WEBSITE_ID;
 
 const bannerOffsetByPosition = {
 	top: `${BANNER_HEIGHT_EXTEND}vh`,
@@ -170,6 +172,18 @@ if (siteConfig.font) {
 	data-overlayscrollbars-initialize
 >
 	<head>
+		{
+			umamiScriptUrl &&
+				umamiWebsiteId && (
+					<script
+						is:inline
+						defer
+						src={umamiScriptUrl}
+						data-website-id={umamiWebsiteId}
+					></script>
+				)
+		}
+
 		<!-- 第三方分析脚本 - 延迟加载优化 -->
 		<script is:inline>
 			// 使用 requestIdleCallback 延迟加载第三方脚本

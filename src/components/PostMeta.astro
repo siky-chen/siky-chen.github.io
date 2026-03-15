@@ -117,11 +117,11 @@ const {
 
 {!isHome && id && (
 <script is:inline define:vars={{
-    pageViewsText: i18n(I18nKey.profileStatsPageViews),
-    visitsText: i18n(I18nKey.profileStatsVisits)
+    visitorsText: i18n(I18nKey.profileStatsVisitors),
+    pageViewsText: i18n(I18nKey.profileStatsPageViews)
 }}>
-    function generateStatsText(pageViews, visits) {
-        return `${pageViewsText} ${pageViews} · ${visitsText} ${visits}`;
+    function generateStatsText(visitors, pageViews) {
+        return `${visitorsText} ${visitors} · ${pageViewsText} ${pageViews}`;
     }
 
     async function fetchPageViews() {
@@ -138,15 +138,15 @@ const {
         try {
             const stats = await window.oddmisc.getStats(`/posts/${id}/`);
             const pageViews = stats.pageviews || 0;
-            const visits = stats.visits || 0;
+            const visitors = stats.visitors || 0;
 
-            if (pageViews === 0 && visits === 0) {
+            if (pageViews === 0 && visitors === 0) {
                 container?.classList.add('hidden');
                 return;
             }
 
             container?.classList.remove('hidden');
-            container.querySelector('.page-views-display').textContent = generateStatsText(pageViews, visits);
+            container.querySelector('.page-views-display').textContent = generateStatsText(visitors, pageViews);
         } catch (error) {
             console.error('Error fetching page views:', error);
             container?.classList.add('hidden');

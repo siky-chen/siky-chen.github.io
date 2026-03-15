@@ -319,6 +319,7 @@ enum I18nKey {
 	// 个人资料统计
 	profileStatsLoading = "profileStatsLoading",
 	profileStatsPageViews = "profileStatsPageViews",
+	profileStatsVisitors = "profileStatsVisitors",
 	profileStatsVisits = "profileStatsVisits",
 	profileStatsUnavailable = "profileStatsUnavailable",
 

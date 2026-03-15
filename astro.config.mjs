@@ -28,6 +28,8 @@ import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkContent } from "./src/plugins/remark-content.mjs";
 import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
 
+const umamiShareUrl = process.env.UMAMI_SHARE_URL || false;
+
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.siteURL,
@@ -38,7 +40,7 @@ export default defineConfig({
 
 	integrations: [
 		umami({
-			shareUrl: false,
+			shareUrl: umamiShareUrl,
 		}),
 		swup({
 			theme: false,

@@ -342,6 +342,7 @@ export const en: Translation = {
 	// Profile Stats
 	[Key.profileStatsLoading]: "Loading stats...",
 	[Key.profileStatsPageViews]: "Page views",
+	[Key.profileStatsVisitors]: "Visitors",
 	[Key.profileStatsVisits]: "Visits",
 	[Key.profileStatsUnavailable]: "Stats unavailable",
 
