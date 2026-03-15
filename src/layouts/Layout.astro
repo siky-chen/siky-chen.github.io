@@ -118,8 +118,10 @@ if (!lang) {
 	lang = `${siteConfig.lang}`;
 }
 const siteLang = lang.replace("_", "-");
-const umamiScriptUrl = import.meta.env.UMAMI_SCRIPT_URL;
-const umamiWebsiteId = import.meta.env.UMAMI_WEBSITE_ID;
+const umamiScriptUrl =
+	import.meta.env.PUBLIC_UMAMI_SCRIPT_URL || process.env.UMAMI_SCRIPT_URL;
+const umamiWebsiteId =
+	import.meta.env.PUBLIC_UMAMI_WEBSITE_ID || process.env.UMAMI_WEBSITE_ID;
 
 const bannerOffsetByPosition = {
 	top: `${BANNER_HEIGHT_EXTEND}vh`,

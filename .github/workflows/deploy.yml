@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  repository_dispatch:
+    types: [ content-updated ]
   workflow_dispatch:
 
 permissions:
@@ -31,6 +33,8 @@ jobs:
           UMAMI_SHARE_URL: ${{ secrets.UMAMI_SHARE_URL }}
           UMAMI_SCRIPT_URL: ${{ secrets.UMAMI_SCRIPT_URL }}
           UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
+          PUBLIC_UMAMI_SCRIPT_URL: ${{ secrets.UMAMI_SCRIPT_URL }}
+          PUBLIC_UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
 
   deploy:
     needs: build

@@ -16,6 +16,7 @@ import remarkDirective from "remark-directive";
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
+import { loadEnv } from "./scripts/load-env.js";
 import { siteConfig } from "./src/config.ts";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badge.ts";
@@ -28,9 +29,10 @@ import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkContent } from "./src/plugins/remark-content.mjs";
 import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
 
+// https://astro.build/config
+loadEnv();
 const umamiShareUrl = process.env.UMAMI_SHARE_URL || false;
 
-// https://astro.build/config
 export default defineConfig({
 	site: siteConfig.siteURL,
 	base: "/",
