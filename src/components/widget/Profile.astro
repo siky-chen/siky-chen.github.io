@@ -52,11 +52,11 @@ import { i18n } from "../../i18n/translation";
             }
         </div>
         
-        <div class="umami-stats-container hidden">
+        <div class="umami-stats-container">
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-gray-500 mt-2 text-center">
                 <Icon name="fa7-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
-                <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
+                <span class="site-stats-display">{i18n(I18nKey.profileStatsVisitors)} 0 · {i18n(I18nKey.profileStatsPageViews)} 0</span>
             </div>
         </div>
     </div>
@@ -71,15 +71,12 @@ import { i18n } from "../../i18n/translation";
     }
 
     async function fetchSiteStats(retryCount = 0) {
-        const container = document.querySelector('.umami-stats-container');
-
         // oddmisc runtime 可能比页面脚本稍晚挂载，短暂重试几次
         if (!window.oddmisc) {
             if (retryCount < 10) {
                 setTimeout(() => fetchSiteStats(retryCount + 1), 500);
                 return;
             }
-            container?.classList.add('hidden');
             return;
         }
 
@@ -89,12 +86,6 @@ import { i18n } from "../../i18n/translation";
             const visitors = stats.visitors || 0;
 
             // 数据为 0 时隐藏
-            if (pageViews === 0 && visitors === 0) {
-                container?.classList.add('hidden');
-                return;
-            }
-
-            container?.classList.remove('hidden');
             document.querySelectorAll('.site-stats-display').forEach(el => {
                 el.textContent = generateStatsText(visitors, pageViews);
             });
@@ -104,7 +95,6 @@ import { i18n } from "../../i18n/translation";
                 setTimeout(() => fetchSiteStats(retryCount + 1), 2000);
                 return;
             }
-            container?.classList.add('hidden');
         }
     }
 
