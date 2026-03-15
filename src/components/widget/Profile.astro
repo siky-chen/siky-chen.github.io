@@ -6,8 +6,11 @@ import ImageWrapper from "../misc/ImageWrapper.astro";
 import TypewriterText from "../TypewriterText.astro";
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
+
+const wechatQrUrl = "/assets/contact/wechat-qr.webp";
 ---
 
+<div class="profile-card-widget">
 <div class="card-base p-3">
     <a aria-label="Go to About Page" href={url('/about/')}
        class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
@@ -43,6 +46,14 @@ import { i18n } from "../../i18n/translation";
                     <Icon name={item.icon} class="text-[1.5rem]"></Icon>
                 </a>
             )}
+            <button
+                type="button"
+                aria-label="微信联系"
+                aria-haspopup="dialog"
+                class="wechat-trigger btn-regular rounded-lg h-10 w-10 active:scale-90"
+            >
+                <Icon name="fa7-brands:weixin" class="text-[1.5rem]" />
+            </button>
             {profileConfig.links.length == 1 && 
                 <a rel="me" aria-label={profileConfig.links[0].name} href={profileConfig.links[0].url} target="_blank"
                    class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95">
@@ -62,9 +73,45 @@ import { i18n } from "../../i18n/translation";
     </div>
 </div>
 
+<div
+    class="wechat-qr-dialog pointer-events-none fixed inset-0 z-[120] hidden flex items-center justify-center p-4 opacity-0 transition duration-200"
+    role="dialog"
+    aria-modal="true"
+    aria-label="微信联系二维码"
+>
+    <div class="wechat-qr-backdrop absolute inset-0 bg-black/55 backdrop-blur-sm"></div>
+    <div class="card-base relative z-10 w-full max-w-sm overflow-hidden rounded-[1.75rem] border border-white/10 p-5 shadow-2xl">
+        <button
+            type="button"
+            class="wechat-close btn-plain absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full"
+            aria-label="关闭微信二维码"
+        >
+            <Icon name="material-symbols:close-rounded" class="text-xl" />
+        </button>
+
+        <div class="mb-4 pr-10">
+            <div class="text-lg font-bold text-90">微信联系</div>
+            <p class="mt-1 text-sm text-50">扫一扫二维码添加我，备注一下来意会更方便。</p>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl bg-white p-3">
+            <img
+                src={wechatQrUrl}
+                alt="Siky 的微信二维码"
+                class="wechat-qr-image block max-h-[75vh] w-full rounded-xl object-contain"
+                loading="lazy"
+            />
+        </div>
+
+        <p class="wechat-qr-hint mt-3 hidden text-center text-xs text-50"></p>
+    </div>
+</div>
+</div>
+
 <script is:inline define:vars={{
     profileStatsPageViews: i18n(I18nKey.profileStatsPageViews),
-    profileStatsVisitors: i18n(I18nKey.profileStatsVisitors)
+    profileStatsVisitors: i18n(I18nKey.profileStatsVisitors),
+    wechatQrUrl
 }}>
     function generateStatsText(visitors, pageViews) {
         return `${profileStatsVisitors} ${visitors} · ${profileStatsPageViews} ${pageViews}`;
@@ -103,4 +150,77 @@ import { i18n } from "../../i18n/translation";
     } else {
         fetchSiteStats();
     }
+
+    function openWechatDialog(wechatDialog) {
+        if (!wechatDialog) return;
+        wechatDialog.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            wechatDialog.classList.remove('pointer-events-none', 'opacity-0');
+        });
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeWechatDialog(wechatDialog) {
+        if (!wechatDialog) return;
+        wechatDialog.classList.add('pointer-events-none', 'opacity-0');
+        setTimeout(() => wechatDialog.classList.add('hidden'), 200);
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function initWechatDialog() {
+        document.querySelectorAll('.profile-card-widget').forEach((root, index) => {
+            const trigger = root.querySelector('.wechat-trigger');
+            const dialog = root.querySelector('.wechat-qr-dialog');
+            if (!(trigger instanceof HTMLElement) || !(dialog instanceof HTMLElement)) return;
+
+            const dialogId = `wechat-qr-dialog-${index + 1}`;
+            trigger.dataset.dialogId = dialogId;
+            trigger.setAttribute('aria-controls', dialogId);
+
+            if (!dialog.dataset.portalMounted) {
+                dialog.dataset.portalMounted = 'true';
+                dialog.id = dialogId;
+                document.body.appendChild(dialog);
+            }
+
+            const wechatQrImage = dialog.querySelector('.wechat-qr-image');
+            const wechatHint = dialog.querySelector('.wechat-qr-hint');
+            if (wechatQrImage && wechatHint && !wechatQrImage.dataset.boundError) {
+                wechatQrImage.dataset.boundError = 'true';
+                wechatQrImage.addEventListener('error', () => {
+                    wechatHint.classList.remove('hidden');
+                    wechatHint.textContent = `还没找到二维码图片，请把它放到 ${wechatQrUrl}`;
+                }, { once: true });
+            }
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        if (target.closest('.wechat-trigger')) {
+            const trigger = target.closest('.wechat-trigger');
+            const dialogId = trigger?.getAttribute('aria-controls');
+            const dialog = dialogId ? document.getElementById(dialogId) : null;
+            openWechatDialog(dialog);
+            return;
+        }
+
+        if (target.closest('.wechat-close') || target.closest('.wechat-qr-backdrop')) {
+            const dialog = target.closest('.wechat-qr-dialog');
+            closeWechatDialog(dialog);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            document.querySelectorAll('.wechat-qr-dialog').forEach((dialog) => {
+                closeWechatDialog(dialog);
+            });
+        }
+    });
+
+    initWechatDialog();
+    document.addEventListener('astro:page-load', initWechatDialog);
 </script>
