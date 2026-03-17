@@ -598,7 +598,7 @@ const transparentClass = shouldEnableTransparency
 </div>
 
 <!-- Banner - 始终渲染，通过 JS 控制显示隐藏 -->
-<div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
+<div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden h-[var(--banner-height-home)] ${mobileNonHomeBannerClass}`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
 
     {siteConfig.banner.carousel?.enable && ((bannerImages.desktop && Array.isArray(bannerImages.desktop) && bannerImages.desktop.length > 1) || (bannerImages.mobile && Array.isArray(bannerImages.mobile) && bannerImages.mobile.length > 1)) ? (
         <!-- Carousel mode for multiple images -->
@@ -706,8 +706,8 @@ const transparentClass = shouldEnableTransparency
     )}
     
     <!-- Home page text overlay -->
-    {siteConfig.banner.homeText?.enable && (
-        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
+    {siteConfig.banner.homeText?.enable && showHomeText && (
+        <div class="banner-text-overlay absolute inset-0 z-20 flex items-center justify-center">
             <div class="max-w-(--page-width) w-full px-0 md:px-4 mx-auto flex items-center justify-center h-full">
                 <div class="w-4/5 lg:w-3/4 text-center mb-0">
                     <div class="flex flex-col">
@@ -1447,6 +1447,22 @@ body.wallpaper-transparent #toc-inner-wrapper:has(table-of-contents[data-loaded=
         flex: 0 0 calc(25% - 0.75rem) !important;
         margin-top: 0 !important; /* 确保没有垂直间距干扰 */
         margin-bottom: 0 !important;
+    }
+    
+    /* 公告栏特殊样式调整 */
+    :global(#main-grid[data-layout-mode="grid"] #sidebar widget-layout[data-id="announcement"] .flex.items-center.justify-between > div:first-child) {
+        width: 100% !important;
+        flex: 1 !important;
+    }
+    /* 公告栏拉伸链接按钮 */
+    :global(#main-grid[data-layout-mode="grid"] #sidebar widget-layout[data-id="announcement"] a) {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+    /* 公告栏隐藏关闭按钮 */
+    :global(#main-grid[data-layout-mode="grid"] #sidebar widget-layout[data-id="announcement"] button[onclick="closeAnnouncement()"]) {
+        display: none !important;
     }
 }
 

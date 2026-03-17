@@ -413,7 +413,7 @@ function portal(node: HTMLElement) {
   <div use:portal class="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity" on:click={closeModal}>
     <div class="bg-(--card-bg) rounded-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto flex flex-col shadow-2xl transform transition-all" on:click|stopPropagation>
       
-      <div class="p-6 flex justify-center bg-(--btn-plain-bg-hover) min-h-[200px] items-center">
+      <div class="p-6 flex justify-center bg-(--card-bg) min-h-[200px] items-center">
         {#if posterImage}
           <img src={posterImage} alt="Poster" class="max-w-full h-auto shadow-lg rounded-lg" />
         {:else}
@@ -450,3 +450,21 @@ function portal(node: HTMLElement) {
     </div>
   </div>
 {/if}
+
+<style lang="css">
+  button.btn-regular {
+    transition: background-color 150ms, color 150ms;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--btn-regular-bg);
+  }
+
+  button.btn-regular:hover {
+    background-color: var(--btn-regular-bg-hover);
+  }
+
+  button.btn-regular:active {
+    background-color: var(--btn-regular-bg-active);
+  }
+</style>

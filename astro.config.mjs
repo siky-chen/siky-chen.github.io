@@ -13,7 +13,6 @@ import rehypeComponents from "rehype-components";
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive";
-import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
 import { loadEnv } from "./scripts/load-env.js";
@@ -28,6 +27,8 @@ import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkContent } from "./src/plugins/remark-content.mjs";
 import { rehypeImageWidth } from "./src/plugins/rehype-image-width.mjs";
+import rehypeExternalLinks from "rehype-external-links";
+import { remarkFixGithubAdmonitions } from "./src/plugins/remark-fix-github-admonitions.js";
 
 // https://astro.build/config
 loadEnv();
@@ -124,7 +125,7 @@ export default defineConfig({
 		remarkPlugins: [
 			remarkMath,
 			remarkContent,
-			remarkGithubAdmonitionsToDirectives,
+			remarkFixGithubAdmonitions,
 			remarkDirective,
 			remarkSectionize,
 			parseDirectiveNode,
@@ -132,6 +133,13 @@ export default defineConfig({
 		],
 		rehypePlugins: [
 			rehypeKatex,
+			[
+				rehypeExternalLinks,
+				{
+					target: "_blank",
+					rel: ["nofollow", "noopener", "noreferrer"],
+				},
+			],
 			rehypeSlug,
 			rehypeWrapTable,
 			rehypeMermaid,
