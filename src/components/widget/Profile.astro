@@ -67,19 +67,26 @@ import { i18n } from "../../i18n/translation";
     profileStatsVisits: i18n(I18nKey.profileStatsVisits),
     profileStatsUnavailable: i18n(I18nKey.profileStatsUnavailable)
 }}>
+    const PROFILE_STATS_DEBUG_PREFIX = '[profile-stats]';
+
     function generateStatsText(pageViews, visits) {
         return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
     }
 
     async function fetchSiteStats(isRetry = false) {
-        const container = document.querySelector('.umami-stats-container');
+        const containers = document.querySelectorAll('.umami-stats-container');
         
         // oddmisc 未加载则等待重试
         if (!window.oddmisc) {
+            console.warn(
+                `${PROFILE_STATS_DEBUG_PREFIX} oddmisc runtime is not available yet.`,
+                { isRetry }
+            );
             if (!isRetry) {
                 setTimeout(() => fetchSiteStats(true), 500);
             } else {
-                container?.classList.add('hidden');
+                containers.forEach((el) => el.classList.add('hidden'));
+                console.warn(`${PROFILE_STATS_DEBUG_PREFIX} stats panel hidden because oddmisc was not injected.`);
             }
             return;
         }
@@ -91,17 +98,22 @@ import { i18n } from "../../i18n/translation";
 
             // 数据为 0 时隐藏
             if (pageViews === 0 && visits === 0) {
-                container?.classList.add('hidden');
+                containers.forEach((el) => el.classList.add('hidden'));
+                console.info(`${PROFILE_STATS_DEBUG_PREFIX} stats resolved but values are zero.`, stats);
                 return;
             }
 
-            container?.classList.remove('hidden');
+            containers.forEach((el) => el.classList.remove('hidden'));
             document.querySelectorAll('.site-stats-display').forEach(el => {
                 el.textContent = generateStatsText(pageViews, visits);
             });
+            console.info(`${PROFILE_STATS_DEBUG_PREFIX} stats loaded successfully.`, {
+                pageViews,
+                visits,
+            });
         } catch (error) {
-            console.error('Error fetching site stats:', error);
-            container?.classList.add('hidden');
+            console.error(`${PROFILE_STATS_DEBUG_PREFIX} failed to fetch site stats.`, error);
+            containers.forEach((el) => el.classList.add('hidden'));
         }
     }
 
