@@ -63,11 +63,11 @@ const wechatQrUrl = "/assets/contact/wechat-qr.webp";
             }
         </div>
         
-        <div class="umami-stats-container">
+        <div class="umami-stats-container hidden">
             <hr class="my-2 border-t border-dashed border-gray-300 dark:border-gray-700" />
             <div class="text-sm text-gray-500 mt-2 text-center">
                 <Icon name="fa7-solid:eye" class="inline-block mr-1 text-gray-400 text-sm align-middle" />
-                <span class="site-stats-display">{i18n(I18nKey.profileStatsVisitors)} 0 · {i18n(I18nKey.profileStatsPageViews)} 0</span>
+                <span class="site-stats-display">{i18n(I18nKey.profileStatsLoading)}</span>
             </div>
         </div>
     </div>
@@ -118,12 +118,15 @@ const wechatQrUrl = "/assets/contact/wechat-qr.webp";
     }
 
     async function fetchSiteStats(retryCount = 0) {
+        const containers = document.querySelectorAll('.umami-stats-container');
+
         // oddmisc runtime 可能比页面脚本稍晚挂载，短暂重试几次
         if (!window.oddmisc) {
             if (retryCount < 10) {
                 setTimeout(() => fetchSiteStats(retryCount + 1), 500);
                 return;
             }
+            containers.forEach((el) => el.classList.add('hidden'));
             return;
         }
 
@@ -132,7 +135,12 @@ const wechatQrUrl = "/assets/contact/wechat-qr.webp";
             const pageViews = stats.pageviews || 0;
             const visitors = stats.visitors || 0;
 
-            // 数据为 0 时隐藏
+            if (pageViews === 0 && visitors === 0) {
+                containers.forEach((el) => el.classList.add('hidden'));
+                return;
+            }
+
+            containers.forEach((el) => el.classList.remove('hidden'));
             document.querySelectorAll('.site-stats-display').forEach(el => {
                 el.textContent = generateStatsText(visitors, pageViews);
             });
@@ -142,6 +150,7 @@ const wechatQrUrl = "/assets/contact/wechat-qr.webp";
                 setTimeout(() => fetchSiteStats(retryCount + 1), 2000);
                 return;
             }
+            containers.forEach((el) => el.classList.add('hidden'));
         }
     }
 
