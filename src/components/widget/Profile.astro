@@ -64,13 +64,13 @@ import { i18n } from "../../i18n/translation";
 
 <script is:inline define:vars={{
     profileStatsPageViews: i18n(I18nKey.profileStatsPageViews),
-    profileStatsVisits: i18n(I18nKey.profileStatsVisits),
+    profileStatsVisitors: i18n(I18nKey.profileStatsVisitors),
     profileStatsUnavailable: i18n(I18nKey.profileStatsUnavailable)
 }}>
     const PROFILE_STATS_DEBUG_PREFIX = '[profile-stats]';
 
-    function generateStatsText(pageViews, visits) {
-        return `${profileStatsPageViews} ${pageViews} · ${profileStatsVisits} ${visits}`;
+    function generateStatsText(visitors, pageViews) {
+        return `${profileStatsVisitors} ${visitors} · ${profileStatsPageViews} ${pageViews}`;
     }
 
     async function fetchSiteStats(isRetry = false) {
@@ -94,10 +94,10 @@ import { i18n } from "../../i18n/translation";
         try {
             const stats = await window.oddmisc.getSiteStats();
             const pageViews = stats.pageviews || 0;
-            const visits = stats.visits || 0;
+            const visitors = stats.visitors || 0;
 
             // 数据为 0 时隐藏
-            if (pageViews === 0 && visits === 0) {
+            if (pageViews === 0 && visitors === 0) {
                 containers.forEach((el) => el.classList.add('hidden'));
                 console.info(`${PROFILE_STATS_DEBUG_PREFIX} stats resolved but values are zero.`, stats);
                 return;
@@ -105,11 +105,11 @@ import { i18n } from "../../i18n/translation";
 
             containers.forEach((el) => el.classList.remove('hidden'));
             document.querySelectorAll('.site-stats-display').forEach(el => {
-                el.textContent = generateStatsText(pageViews, visits);
+                el.textContent = generateStatsText(visitors, pageViews);
             });
             console.info(`${PROFILE_STATS_DEBUG_PREFIX} stats loaded successfully.`, {
+                visitors,
                 pageViews,
-                visits,
             });
         } catch (error) {
             console.error(`${PROFILE_STATS_DEBUG_PREFIX} failed to fetch site stats.`, error);
