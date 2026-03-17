@@ -28,8 +28,6 @@ author: "Siky Chen"
 3. 一次 `MCP` 调用链路是怎么跑起来的
 4. 一个 `MCP Server` 应该怎么开发、调试和限权
 
-![MCP 入门示意图](image-20250223214308430.webp)
-
 ## 1. MCP 是什么
 
 `MCP` 全称是 `Model Context Protocol`，可以把它理解成 AI Agent 时代的“工具接入标准”。
