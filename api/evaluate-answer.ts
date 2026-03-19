@@ -60,7 +60,6 @@ function buildPrompt(payload: {
 	sectionTitle?: string;
 	subSectionTitle?: string;
 	question: string;
-	referenceAnswer?: string;
 	answer: string;
 }) {
 	const rubricText = RUBRIC.map((item) => {
@@ -70,6 +69,7 @@ function buildPrompt(payload: {
 	return [
 		"你是一名严谨的机器人与嵌入式面试官。",
 		"请严格按照下面的 rubric 给候选人的回答打分，并尽量保持稳定、保守和可解释。",
+		"不要参考或复述任何参考答案内容，只根据题目和候选人答案进行评分与改写。",
 		"每个维度按 1-5 分评分，5 分最好，1 分最差。",
 		"总分按权重换算到 0-100，直接写入 score 字段。",
 		"请只输出一个 JSON 对象，不要输出 Markdown 代码块，不要输出额外解释。",
@@ -87,7 +87,6 @@ function buildPrompt(payload: {
 		`一级章节：${payload.sectionTitle || ""}`,
 		`二级章节：${payload.subSectionTitle || ""}`,
 		`题目：${payload.question}`,
-		`参考答案：${payload.referenceAnswer || "无"}`,
 		`候选人答案：${payload.answer}`,
 	].join("\n");
 }
@@ -205,7 +204,6 @@ export default async function handler(req: any, res: any) {
 			sectionTitle: String(body.sectionTitle || ""),
 			subSectionTitle: String(body.subSectionTitle || ""),
 			question,
-			referenceAnswer: String(body.referenceAnswer || ""),
 			answer,
 		});
 
