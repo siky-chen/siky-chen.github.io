@@ -160,15 +160,6 @@ password: "Cc2001711"
 </details>
 
 
-#### Q16. UWB 在你们系统中承担什么作用？它和激光雷达、IMU、里程计是怎么协同的？
-
-<details>
-<summary>点击查看参考答案</summary>
-
-`UWB` 更适合作为绝对位置参考或者辅助定位来源，尤其是在纹理少、特征弱或局部环境变化比较大的区域。我的答法通常是：激光雷达负责主定位，里程计和 `IMU` 保证短时连续性，`UWB` 在特定场景下提供全局约束或漂移修正。这样能让系统在复杂工厂环境里更稳。
-</details>
-
-
 #### Q17. 多传感器时间同步怎么做？如果时间戳不准会出现什么现象？
 
 <details>
@@ -193,15 +184,6 @@ password: "Cc2001711"
 <summary>点击查看参考答案</summary>
 
 安全雷达更适合做安全区域防护和近距离风险检测，超声适合贴身障碍检测和盲区补充，相机更适合做目标识别、语义理解和工位识别。我的理解是，这几类传感器不是互相替代，而是分层补盲、互相兜底。
-</details>
-
-
-#### Q20. 控制周期、定位周期、感知周期分别是多少？为什么这样分配？
-
-<details>
-<summary>点击查看参考答案</summary>
-
-这里一定要换成你的真实数据。如果没有被追问到具体数字，我一般会说控制链路周期最高，定位次之，感知根据传感器频率和算法负载来定，因为控制更关注实时闭环，定位更关注稳定性，感知更关注信息质量和算力平衡。
 </details>
 
 
@@ -371,9 +353,72 @@ password: "Cc2001711"
 </details>
 
 
+#### Q39. I2C 为什么通常使用开漏输出？上拉电阻起什么作用？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`I2C` 之所以用开漏，本质上是因为它要把 SDA 和 SCL 做成“线与”结构，任何设备都只能主动拉低，不能主动推高。这样多个器件共享总线时，不会因为两个输出同时驱动高低电平而发生硬件冲突，还天然支持多主仲裁。上拉电阻负责在没人拉低时把总线拉回高电平，同时决定上升沿速度和功耗。我的理解是，开漏解决的是“总线能不能安全共享”，上拉电阻解决的是“总线高电平怎么形成”。
+</details>
+
+
+#### Q40. I2C 的 clock stretching、多主仲裁和总线空闲机制是怎么工作的？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`clock stretching` 指的是从设备准备不过来时，可以把 `SCL` 拉低，通知主机先等等；这在慢外设或内部缓冲没准备好的场景里很常见。多主仲裁则依赖开漏总线和 SDA 采样，主机在发送过程中如果发现自己写的是高电平但读到低电平，就说明总线上有别的主机优先级更高，自己要退出。总线空闲通常表现为 `SDA` 和 `SCL` 都保持高电平，这也是发起新通信前最基本的空闲条件。这个机制的核心是：总线状态由所有器件共同决定，而不是某一个节点单独说了算。
+</details>
+
+
+#### Q41. SPI 为什么通常使用推挽输出？和开漏相比有什么区别？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`SPI` 通常用推挽，是因为它不强调总线共享仲裁，而是更看重高速、强驱动和清晰的边沿。推挽输出既能主动拉高，也能主动拉低，上升沿和下降沿都更快，适合高频短距离通信。和开漏相比，推挽的抗干扰和速度通常更好，但不能像 `I2C` 那样靠“线与”方式直接多设备并联共用一根数据线。我的理解是，`I2C` 的重点是“安全共享”，`SPI` 的重点是“速度和时序确定性”。
+</details>
+
+
+#### Q42. SPI 的 CPOL / CPHA 是什么意思？Mode 0~3 怎么理解？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`CPOL` 决定时钟空闲时是高还是低，`CPHA` 决定数据在哪个边沿采样、哪个边沿改变。两者组合起来就是常说的 `Mode 0~3`。我一般会把它理解成“时钟基线 + 采样边沿”的组合定义，关键是主从双方必须严格一致，不然就会采错位。实际接外设时，最常见的问题不是协议本身，而是 `Mode` 选错、位序没对齐或者时钟频率超出器件能力。
+</details>
+
+
+#### Q43. UART 帧格式是怎样的？起始位、停止位、校验位分别有什么作用？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`UART` 是异步串行通信，通常一帧会包含起始位、数据位、可选校验位和停止位。起始位用来告诉接收端“这一帧开始了”，停止位用来给接收端留出恢复和同步的时间；校验位则用于做简单的错误检测。因为没有独立时钟线，所以双方必须提前约定好波特率、数据位数、校验方式和停止位长度。我的理解是，`UART` 的关键不是“有没有时钟”，而是“怎么让双方对时间和采样点有一致假设”。
+</details>
+
+
+#### Q44. UART、TTL 串口和 RS485 有什么区别？实际项目里怎么选？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+`UART` 说的是通信协议和时序，`TTL` 说的是电平标准，而 `RS485` 说的是差分物理层。也就是说，`UART` 可以跑在 `TTL` 电平上，也可以通过转换芯片跑在 `RS485` 线上。`TTL` 串口适合板内短距离调试和设备直连，`RS485` 更适合长距离、强干扰环境和多节点总线。选型时我通常看距离、抗干扰、是否需要多点挂载，以及现场布线是否复杂。
+</details>
+
+
+#### Q45. GPIO 输入为什么会有上拉、下拉和浮空？怎么理解抗干扰？
+
+<details>
+<summary>点击查看参考答案</summary>
+
+GPIO 输入如果处于浮空状态，外部没有明确把它拉到高或低时，管脚电平就可能被噪声、串扰或者漏电流影响，读出来会不稳定。上拉和下拉的作用，就是给输入一个默认状态，让引脚在没有外部驱动时也有确定的逻辑值。比如按键、开漏中断、总线复位检测这些场景，通常都要配合上拉或下拉一起设计。我的理解是，上拉下拉解决的不是“能不能读到电平”，而是“在没人驱动时，读到的值是不是可预测”。
+</details>
+
+
 ### 5. 嵌入式系统
 
-#### Q39. MCU 与 Linux / SoC 通信一般有哪些方式？
+#### Q46. MCU 与 Linux / SoC 通信一般有哪些方式？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -382,7 +427,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q40. 什么是 RTOS？RTOS 的核心特性是什么？
+#### Q47. 什么是 RTOS？RTOS 的核心特性是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -391,7 +436,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q41. Zephyr RTOS 和 Linux 的主要区别是什么？
+#### Q48. Zephyr RTOS 和 Linux 的主要区别是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -400,7 +445,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q42. 在嵌入式开发中如何保证实时性？
+#### Q49. 在嵌入式开发中如何保证实时性？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -409,7 +454,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q43. 什么是优先级反转？如何解决？
+#### Q50. 什么是优先级反转？如何解决？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -418,7 +463,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q44. Zephyr RTOS 和 FreeRTOS 的差异你怎么理解？
+#### Q51. Zephyr RTOS 和 FreeRTOS 的差异你怎么理解？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -427,7 +472,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q45. DeviceTree 在 Zephyr 和 Linux 中分别起什么作用？
+#### Q52. DeviceTree 在 Zephyr 和 Linux 中分别起什么作用？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -436,7 +481,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q46. 什么是 BSP？你做过哪些 BSP 级适配工作？
+#### Q53. 什么是 BSP？你做过哪些 BSP 级适配工作？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -445,7 +490,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q47. MCU boot 的启动流程一般是什么样的？
+#### Q54. MCU boot 的启动流程一般是什么样的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -454,7 +499,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q48. SoC 上跑 Linux 时，典型的 boot 流程是什么？
+#### Q55. SoC 上跑 Linux 时，典型的 boot 流程是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -463,7 +508,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q49. MCU 场景下的 Bootloader 和应用程序职责边界通常怎么划分？
+#### Q56. MCU 场景下的 Bootloader 和应用程序职责边界通常怎么划分？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -472,7 +517,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q50. U-Boot 在嵌入式 Linux 的 SoC 系统里通常承担哪些职责？
+#### Q57. U-Boot 在嵌入式 Linux 的 SoC 系统里通常承担哪些职责？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -481,7 +526,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q51. U-Boot 和 Linux Kernel 的分工是什么？为什么不能混在一起理解？
+#### Q58. U-Boot 和 Linux Kernel 的分工是什么？为什么不能混在一起理解？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -490,7 +535,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q52. U-Boot 里常见的环境变量和 bootcmd / bootargs 分别有什么作用？
+#### Q59. U-Boot 里常见的环境变量和 bootcmd / bootargs 分别有什么作用？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -499,7 +544,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q53. 如果是 MCU 系统启动不起来，你会怎么排查？
+#### Q60. 如果是 MCU 系统启动不起来，你会怎么排查？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -508,7 +553,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q54. 如果是 SoC / Linux 系统启动不起来，你会怎么区分是 boot 阶段、内核阶段还是应用阶段的问题？
+#### Q61. 如果是 SoC / Linux 系统启动不起来，你会怎么区分是 boot 阶段、内核阶段还是应用阶段的问题？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -517,7 +562,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q55. A/B 分区升级或双镜像回滚机制为什么重要？设计时要注意什么？
+#### Q62. A/B 分区升级或双镜像回滚机制为什么重要？设计时要注意什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -526,7 +571,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q56. Secure Boot 一般想解决什么问题？它和普通镜像校验有什么区别？
+#### Q63. Secure Boot 一般想解决什么问题？它和普通镜像校验有什么区别？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -535,7 +580,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q57. 高优先级实时任务和普通业务任务该如何划分？
+#### Q64. 高优先级实时任务和普通业务任务该如何划分？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -544,7 +589,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q58. 如果系统出现死锁、任务饥饿或 CPU 飙高，你如何排查？
+#### Q65. 如果系统出现死锁、任务饥饿或 CPU 飙高，你如何排查？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -555,7 +600,7 @@ password: "Cc2001711"
 
 ### 6. 车载诊断与信息安全
 
-#### Q59. AUTOSAR 的核心分层思想是什么？
+#### Q66. AUTOSAR 的核心分层思想是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -564,7 +609,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q60. AUTOSAR NM 的作用是什么？解决了什么问题？
+#### Q67. AUTOSAR NM 的作用是什么？解决了什么问题？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -573,7 +618,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q61. UDS 常见服务有哪些？你参与过哪些诊断功能实现？
+#### Q68. UDS 常见服务有哪些？你参与过哪些诊断功能实现？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -582,7 +627,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q62. SecOC 的核心作用是什么？为什么车载报文需要认证？
+#### Q69. SecOC 的核心作用是什么？为什么车载报文需要认证？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -591,7 +636,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q63. E2E 保护解决的是什么问题？和 SecOC 的区别是什么？
+#### Q70. E2E 保护解决的是什么问题？和 SecOC 的区别是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -600,7 +645,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q64. HSM 驱动通常负责哪些能力？
+#### Q71. HSM 驱动通常负责哪些能力？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -609,7 +654,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q65. 为什么会使用 SHA-512 和 AES-128 CMAC？分别适合什么场景？
+#### Q72. 为什么会使用 SHA-512 和 AES-128 CMAC？分别适合什么场景？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -618,7 +663,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q66. 如果出现认证失败、计数器异常或重放攻击风险，系统应该怎么处理？
+#### Q73. 如果出现认证失败、计数器异常或重放攻击风险，系统应该怎么处理？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -631,7 +676,7 @@ password: "Cc2001711"
 
 ### 1. AGV / 机器人项目
 
-#### Q67. 你在 AGV 项目中主要负责哪些模块？
+#### Q74. 你在 AGV 项目中主要负责哪些模块？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -640,7 +685,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q68. AGV 系统的软件架构大致是怎样的？
+#### Q75. AGV 系统的软件架构大致是怎样的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -649,7 +694,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q69. 激光雷达建图使用的是什么方案？为什么这样选？
+#### Q76. 激光雷达建图使用的是什么方案？为什么这样选？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -658,7 +703,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q70. Cartographer 的核心原理你怎么理解？
+#### Q77. Cartographer 的核心原理你怎么理解？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -667,7 +712,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q71. 使用 Cartographer 建图时，哪些因素最容易影响效果？
+#### Q78. 使用 Cartographer 建图时，哪些因素最容易影响效果？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -676,7 +721,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q72. Cartographer 常调的参数有哪些？你实际会怎么回答？
+#### Q79. Cartographer 常调的参数有哪些？你实际会怎么回答？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -685,7 +730,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q73. 机器人在工厂环境中如何处理动态障碍物？
+#### Q80. 机器人在工厂环境中如何处理动态障碍物？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -694,7 +739,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q74. 如果机器人出现定位漂移，你会如何排查？
+#### Q81. 如果机器人出现定位漂移，你会如何排查？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -703,7 +748,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q75. 你们的多传感器融合方案是怎么实现的？
+#### Q82. 你们的多传感器融合方案是怎么实现的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -712,7 +757,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q76. AGV 的控制周期是多少？
+#### Q83. AGV 的控制周期是多少？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -721,7 +766,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q77. 如果导航失败系统会如何处理？
+#### Q84. 如果导航失败系统会如何处理？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -730,7 +775,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q78. 路径跟踪误差偏大时，你会优先检查哪些模块？
+#### Q85. 路径跟踪误差偏大时，你会优先检查哪些模块？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -739,7 +784,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q79. 机器人在动态障碍密集区域如何平衡通行效率和安全性？
+#### Q86. 机器人在动态障碍密集区域如何平衡通行效率和安全性？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -748,7 +793,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q80. 你们的安全机制如何处理急停、避障减速、保护停车和人工接管？
+#### Q87. 你们的安全机制如何处理急停、避障减速、保护停车和人工接管？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -757,7 +802,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q81. 你和 Global 团队协作时，如何做需求澄清和技术对齐？
+#### Q88. 你和 Global 团队协作时，如何做需求澄清和技术对齐？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -768,7 +813,7 @@ password: "Cc2001711"
 
 ### 2. 视觉部署（RK3588）
 
-#### Q82. 为什么选择 RK3588 平台？
+#### Q89. 为什么选择 RK3588 平台？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -777,7 +822,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q83. ONNX -> RKNN 的转换流程是什么？
+#### Q90. ONNX -> RKNN 的转换流程是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -786,7 +831,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q84. 模型量化会带来什么问题？
+#### Q91. 模型量化会带来什么问题？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -795,7 +840,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q85. NPU 推理相比 CPU / GPU 有什么优势？
+#### Q92. NPU 推理相比 CPU / GPU 有什么优势？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -804,7 +849,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q86. 托盘识别模型大概多少 FPS？
+#### Q93. 托盘识别模型大概多少 FPS？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -813,7 +858,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q87. 视觉识别结果是如何与 ROS2 控制系统联动的？
+#### Q94. 视觉识别结果是如何与 ROS2 控制系统联动的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -822,7 +867,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q88. 你们如何做 NPU 推理性能 profiling 和瓶颈定位？
+#### Q95. 你们如何做 NPU 推理性能 profiling 和瓶颈定位？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -831,7 +876,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q89. 如果现场光照变化、遮挡或托盘姿态异常，视觉系统如何保证鲁棒性？
+#### Q96. 如果现场光照变化、遮挡或托盘姿态异常，视觉系统如何保证鲁棒性？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -842,7 +887,7 @@ password: "Cc2001711"
 
 ### 3. 下位机控制（Zephyr RTOS）
 
-#### Q90. 为什么选择 Zephyr RTOS？
+#### Q97. 为什么选择 Zephyr RTOS？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -851,7 +896,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q91. Zephyr 的 DeviceTree 是做什么用的？
+#### Q98. Zephyr 的 DeviceTree 是做什么用的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -860,7 +905,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q92. 电机控制的基本闭环控制流程是什么？
+#### Q99. 电机控制的基本闭环控制流程是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -869,7 +914,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q93. 编码器数据如何计算速度和里程计？
+#### Q100. 编码器数据如何计算速度和里程计？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -878,7 +923,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q94. CAN 通信如何保证实时性？
+#### Q101. CAN 通信如何保证实时性？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -887,7 +932,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q95. 你提到降级策略，具体是如何设计的？
+#### Q102. 你提到降级策略，具体是如何设计的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -896,7 +941,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q96. 电机控制链路中的采样周期、控制周期、上报周期分别是多少？
+#### Q103. 电机控制链路中的采样周期、控制周期、上报周期分别是多少？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -905,7 +950,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q97. 通信异常、编码器异常、驱动器故障时，下位机会如何进入降级状态？
+#### Q104. 通信异常、编码器异常、驱动器故障时，下位机会如何进入降级状态？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -914,7 +959,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q98. OTA 升级流程怎么设计，才能保证失败可恢复和升级安全？
+#### Q105. OTA 升级流程怎么设计，才能保证失败可恢复和升级安全？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -923,7 +968,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q99. 主控 SoC 和安全控制器之间的状态互锁机制是怎么设计的？
+#### Q106. 主控 SoC 和安全控制器之间的状态互锁机制是怎么设计的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -934,7 +979,7 @@ password: "Cc2001711"
 
 ### 4. 车载平台项目
 
-#### Q100. 你在 eCall 或仪表 / 中控域控制器项目中主要负责哪些模块？
+#### Q107. 你在 eCall 或仪表 / 中控域控制器项目中主要负责哪些模块？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -943,7 +988,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q101. MCU-SoC 多核间通信机制是如何设计的？
+#### Q108. MCU-SoC 多核间通信机制是如何设计的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -952,7 +997,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q102. 诊断、网络管理、网关转发之间是如何协同工作的？
+#### Q109. 诊断、网络管理、网关转发之间是如何协同工作的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -961,7 +1006,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q103. 安全气囊 PWM 时序采集为什么对实时性要求高？
+#### Q110. 安全气囊 PWM 时序采集为什么对实时性要求高？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -972,7 +1017,7 @@ password: "Cc2001711"
 
 ## 三、系统设计类问题（中高级岗位常问）
 
-#### Q104. 如果让你从零设计一个 AGV 系统架构，你会怎么设计？
+#### Q111. 如果让你从零设计一个 AGV 系统架构，你会怎么设计？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -981,7 +1026,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q105. 机器人系统一般如何划分感知、决策、控制层？
+#### Q112. 机器人系统一般如何划分感知、决策、控制层？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -990,7 +1035,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q106. ROS2 系统如何实现模块解耦？
+#### Q113. ROS2 系统如何实现模块解耦？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -999,7 +1044,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q107. 多车系统如何避免路径冲突和死锁？
+#### Q114. 多车系统如何避免路径冲突和死锁？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1008,7 +1053,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q108. 如果系统出现消息堆积或延迟，你如何排查？
+#### Q115. 如果系统出现消息堆积或延迟，你如何排查？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1017,7 +1062,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q109. 机器人系统如何设计安全机制避免撞人？
+#### Q116. 机器人系统如何设计安全机制避免撞人？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1026,7 +1071,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q110. 如何设计一套统一的健康监控、故障上报和降级机制？
+#### Q117. 如何设计一套统一的健康监控、故障上报和降级机制？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1037,7 +1082,7 @@ password: "Cc2001711"
 
 ## 四、工程经验问题（大厂非常重视）
 
-#### Q111. 你在项目中遇到最难的问题是什么？是怎么解决的？
+#### Q118. 你在项目中遇到最难的问题是什么？是怎么解决的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1046,7 +1091,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q112. 如何排查机器人系统中的偶发 bug？
+#### Q119. 如何排查机器人系统中的偶发 bug？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1055,7 +1100,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q113. 如果系统出现间歇性通信失败，你会怎么定位？
+#### Q120. 如果系统出现间歇性通信失败，你会怎么定位？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1064,7 +1109,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q114. 你们如何做代码评审和 CI / CD？
+#### Q121. 你们如何做代码评审和 CI / CD？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1073,7 +1118,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q115. 你们如何保证软件质量？
+#### Q122. 你们如何保证软件质量？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1082,7 +1127,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q116. 你在现场定位问题时最依赖哪些日志、工具和方法？
+#### Q123. 你在现场定位问题时最依赖哪些日志、工具和方法？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1093,7 +1138,7 @@ password: "Cc2001711"
 
 ## 五、AI / RAG 系统问题（你的亮点）
 
-#### Q117. 为什么要做 RAG 系统？
+#### Q124. 为什么要做 RAG 系统？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1102,7 +1147,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q118. RAG 的基本架构是什么？
+#### Q125. RAG 的基本架构是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1111,7 +1156,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q119. 你们使用什么向量数据库？为什么这样选？
+#### Q126. 你们使用什么向量数据库？为什么这样选？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1120,7 +1165,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q120. 如何保证语义检索的准确性？
+#### Q127. 如何保证语义检索的准确性？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1129,7 +1174,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q121. 你是如何把需求文档和 PR 代码建立索引关系的？
+#### Q128. 你是如何把需求文档和 PR 代码建立索引关系的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1138,7 +1183,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q122. 这个系统是如何集成到 CI 流程中的？
+#### Q129. 这个系统是如何集成到 CI 流程中的？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1147,7 +1192,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q123. 这个系统在团队中实际提升了什么效率？
+#### Q130. 这个系统在团队中实际提升了什么效率？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1158,7 +1203,7 @@ password: "Cc2001711"
 
 ## 六、HR / 综合问题
 
-#### Q124. 为什么从雅迅跳到林德叉车？
+#### Q131. 为什么从雅迅跳到林德叉车？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1167,7 +1212,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q125. 你未来想走机器人算法、系统架构还是嵌入式哪个方向？
+#### Q132. 你未来想走机器人算法、系统架构还是嵌入式哪个方向？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1176,7 +1221,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q126. 你最大的技术优势是什么？
+#### Q133. 你最大的技术优势是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1185,7 +1230,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q127. 你觉得自己最大的不足是什么？
+#### Q134. 你觉得自己最大的不足是什么？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1194,7 +1239,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q128. 为什么想加入我们公司？
+#### Q135. 为什么想加入我们公司？
 
 <details>
 <summary>点击查看参考答案</summary>
@@ -1203,7 +1248,7 @@ password: "Cc2001711"
 </details>
 
 
-#### Q129. 你的职业规划是什么？
+#### Q136. 你的职业规划是什么？
 
 <details>
 <summary>点击查看参考答案</summary>

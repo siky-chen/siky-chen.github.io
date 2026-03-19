@@ -36,6 +36,69 @@ const {
 		return encodeURIComponent(text).slice(0, 160);
 	}
 
+	function getPageStorageKey(suffix) {
+		return `ai-answer-review:${window.location.pathname}:${suffix}`;
+	}
+
+	function getQuestionScoreId(questionText) {
+		return escapeStorageKey(questionText);
+	}
+
+	function readJsonStorage(key, fallback) {
+		try {
+			const raw = window.localStorage.getItem(key);
+			if (!raw) return fallback;
+			return JSON.parse(raw);
+		} catch {
+			return fallback;
+		}
+	}
+
+	function writeJsonStorage(key, value) {
+		try {
+			window.localStorage.setItem(key, JSON.stringify(value));
+		} catch {}
+	}
+
+	function getQuestionHistoryKey(questionId) {
+		return getPageStorageKey(`question-history:${questionId}`);
+	}
+
+	function getQuestionScoreHistory(questionId) {
+		const data = readJsonStorage(getQuestionHistoryKey(questionId), []);
+		return Array.isArray(data) ? data : [];
+	}
+
+	function appendQuestionScoreHistory(questionId, record) {
+		const history = getQuestionScoreHistory(questionId);
+		history.unshift(record);
+		writeJsonStorage(getQuestionHistoryKey(questionId), history.slice(0, 12));
+	}
+
+	function getLatestQuestionScore(questionId) {
+		const history = getQuestionScoreHistory(questionId);
+		if (!history.length) return null;
+		const latest = history[0];
+		if (!latest || typeof latest !== "object") return null;
+		return {
+			score: Number(latest.score) || 0,
+			timestamp: latest.timestamp || "",
+		};
+	}
+
+	function formatRecordTime(timestamp) {
+		try {
+			return new Date(timestamp).toLocaleString("zh-CN", {
+				month: "2-digit",
+				day: "2-digit",
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+		} catch {
+			return "";
+		}
+	}
+
 	function getRootConfig() {
 		const root = document.getElementById("ai-answer-review-root");
 		if (!root) return null;
@@ -167,6 +230,92 @@ const {
 		if (followUps) resultNode.appendChild(followUps);
 	}
 
+	function renderQuestionHistory(questionId, historyList, historyEmpty) {
+		if (!(historyList instanceof HTMLElement) || !(historyEmpty instanceof HTMLElement)) {
+			return;
+		}
+
+		historyList.innerHTML = "";
+		const history = getQuestionScoreHistory(questionId);
+		historyEmpty.hidden = history.length > 0;
+
+		history.forEach((record) => {
+			if (!record || typeof record !== "object") return;
+
+			const item = createTextElement("li", "ai-answer-review-history-item", "");
+			const meta = createTextElement(
+				"div",
+				"ai-answer-review-history-meta",
+				formatRecordTime(record.timestamp),
+			);
+			const score = createTextElement(
+				"div",
+				"ai-answer-review-history-score",
+				`${Number(record.score || 0)} / 100`,
+			);
+			const verdict = createTextElement(
+				"div",
+				"ai-answer-review-history-detail",
+				record.verdict || "已完成评分",
+			);
+
+			item.appendChild(meta);
+			item.appendChild(score);
+			item.appendChild(verdict);
+			historyList.appendChild(item);
+		});
+	}
+
+	function updateWeakestQuestions(container) {
+		if (!(container instanceof HTMLElement)) return;
+
+		const intro = container.querySelector(".ai-answer-review-intro");
+		if (!(intro instanceof HTMLElement)) return;
+
+		const list = intro.querySelector("[data-role='weakest-list']");
+		const empty = intro.querySelector("[data-role='weakest-empty']");
+		if (!(list instanceof HTMLElement) || !(empty instanceof HTMLElement)) return;
+
+		const weakestQuestions = Array.from(container.querySelectorAll("h4"))
+			.map((heading) => {
+				const questionText = normalizeText(heading.textContent || "");
+				if (!/^Q\d+\./i.test(questionText)) return null;
+				const latest = getLatestQuestionScore(getQuestionScoreId(questionText));
+				if (!latest) return null;
+				return {
+					questionText,
+					score: latest.score,
+					timestamp: latest.timestamp,
+				};
+			})
+			.filter(Boolean)
+			.sort((a, b) => {
+				if (a.score !== b.score) return a.score - b.score;
+				return String(b.timestamp).localeCompare(String(a.timestamp));
+			})
+			.slice(0, 5);
+
+		list.innerHTML = "";
+		empty.hidden = weakestQuestions.length > 0;
+
+		weakestQuestions.forEach((item) => {
+			const entry = createTextElement("li", "ai-answer-review-weakest-item", "");
+			const question = createTextElement(
+				"div",
+				"ai-answer-review-weakest-question",
+				item.questionText,
+			);
+			const meta = createTextElement(
+				"div",
+				"ai-answer-review-weakest-score",
+				`${item.score} / 100`,
+			);
+			entry.appendChild(question);
+			entry.appendChild(meta);
+			list.appendChild(entry);
+		});
+	}
+
 	function renderError(resultNode, message) {
 		resultNode.innerHTML = "";
 		resultNode.hidden = false;
@@ -266,10 +415,38 @@ const {
 			"ai-answer-review-helper",
 			"评分会结合题目和参考答案，从正确性、完整性、条理和项目结合度几个维度给建议。",
 		);
+		const historySection = createTextElement(
+			"section",
+			"ai-answer-review-history-panel",
+			"",
+		);
+		const historyToggle = createTextElement(
+			"button",
+			"ai-answer-review-button ai-answer-review-history-toggle",
+			"历史分数",
+		);
+		historyToggle.type = "button";
+		const historyContent = createTextElement(
+			"div",
+			"ai-answer-review-history-content",
+			"",
+		);
+		historyContent.hidden = true;
+		const historyEmpty = createTextElement(
+			"p",
+			"ai-answer-review-history-empty",
+			"还没有这道题的历史分数。",
+		);
+		const historyList = createTextElement(
+			"ul",
+			"ai-answer-review-history-list",
+			"",
+		);
 		const resultNode = createTextElement("div", "ai-answer-review-result", "");
 		resultNode.hidden = true;
 
-		const storageKey = `ai-answer-review:${window.location.pathname}:${escapeStorageKey(questionText)}`;
+		const questionId = getQuestionScoreId(questionText);
+		const storageKey = `ai-answer-review:${window.location.pathname}:${questionId}`;
 		const savedAnswer = window.localStorage.getItem(storageKey);
 		if (savedAnswer) {
 			textarea.value = savedAnswer;
@@ -283,6 +460,12 @@ const {
 			const nextHidden = !panel.hidden;
 			panel.hidden = nextHidden;
 			toggleButton.textContent = nextHidden ? "开始练习" : "收起练习";
+		});
+
+		historyToggle.addEventListener("click", () => {
+			const nextHidden = !historyContent.hidden;
+			historyContent.hidden = nextHidden;
+			historyToggle.textContent = nextHidden ? "历史分数" : "收起历史";
 		});
 
 		clearButton.addEventListener("click", () => {
@@ -312,6 +495,14 @@ const {
 					answer,
 				});
 				renderResult(resultNode, result);
+				const scoreValue = Number(result && result.score) || 0;
+				appendQuestionScoreHistory(questionId, {
+					timestamp: new Date().toISOString(),
+					score: scoreValue,
+					verdict: result && result.verdict ? String(result.verdict) : "",
+				});
+				renderQuestionHistory(questionId, historyList, historyEmpty);
+				updateWeakestQuestions(container);
 			} catch (error) {
 				const message =
 					error instanceof Error ? error.message : "AI 评分失败，请稍后重试。";
@@ -327,10 +518,16 @@ const {
 		actionRow.appendChild(scoreButton);
 		actionRow.appendChild(clearButton);
 
+		historyContent.appendChild(historyEmpty);
+		historyContent.appendChild(historyList);
+		historySection.appendChild(historyToggle);
+		historySection.appendChild(historyContent);
+
 		panel.appendChild(label);
 		panel.appendChild(textarea);
 		panel.appendChild(actionRow);
 		panel.appendChild(helper);
+		panel.appendChild(historySection);
 		panel.appendChild(resultNode);
 
 		widget.appendChild(topBar);
@@ -338,13 +535,16 @@ const {
 
 		heading.insertAdjacentElement("afterend", widget);
 		heading.dataset.aiReviewEnhanced = "true";
+		renderQuestionHistory(questionId, historyList, historyEmpty);
 	}
 
 	function injectIntroCard(container) {
 		if (!(container instanceof HTMLElement)) return;
 		if (container.dataset.aiReviewIntroAdded === "true") return;
 
-		const firstQuestion = container.querySelector("h4");
+		const firstQuestion = Array.from(container.querySelectorAll("h4")).find((node) => {
+			return /^Q\d+\./i.test(normalizeText(node.textContent || ""));
+		});
 		if (!(firstQuestion instanceof HTMLElement)) return;
 
 		const intro = createTextElement("div", "ai-answer-review-intro", "");
@@ -362,9 +562,31 @@ const {
 				"每道题下方都可以点“开始练习”，先写自己的回答，再让 AI 评分并给改进建议。",
 			),
 		);
+		intro.appendChild(
+			createTextElement(
+				"div",
+				"ai-answer-review-weakest-title",
+				"最近一次测试成绩最低的 5 道题",
+			),
+		);
+		const weakestEmpty = createTextElement(
+			"p",
+			"ai-answer-review-weakest-empty",
+			"还没有评分记录，做过题之后这里会自动显示。",
+		);
+		weakestEmpty.dataset.role = "weakest-empty";
+		const weakestList = createTextElement(
+			"ul",
+			"ai-answer-review-weakest-list",
+			"",
+		);
+		weakestList.dataset.role = "weakest-list";
+		intro.appendChild(weakestEmpty);
+		intro.appendChild(weakestList);
 
 		firstQuestion.insertAdjacentElement("beforebegin", intro);
 		container.dataset.aiReviewIntroAdded = "true";
+		updateWeakestQuestions(container);
 	}
 
 	function enhanceReviewWidgets() {
@@ -427,6 +649,99 @@ const {
 	margin: 0;
 	font-size: 0.92rem;
 	line-height: 1.6;
+}
+
+.ai-answer-review-weakest-title {
+	margin-top: 0.85rem;
+	font-size: 0.92rem;
+	font-weight: 700;
+	color: var(--primary);
+}
+
+.ai-answer-review-weakest-empty {
+	margin: 0.4rem 0 0;
+	font-size: 0.9rem;
+	line-height: 1.6;
+	color: color-mix(in oklch, currentColor 72%, transparent);
+}
+
+.ai-answer-review-weakest-list {
+	margin: 0.7rem 0 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.55rem;
+}
+
+.ai-answer-review-weakest-item {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.7rem 0.8rem;
+	border-radius: 0.9rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 14%, var(--line-divider));
+	background: color-mix(in oklch, var(--card-bg) 92%, var(--primary) 5%);
+}
+
+.ai-answer-review-weakest-question {
+	font-size: 0.9rem;
+	line-height: 1.6;
+}
+
+.ai-answer-review-weakest-score {
+	flex-shrink: 0;
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--primary);
+}
+
+.ai-answer-review-history-meta,
+.ai-answer-review-history-detail {
+	font-size: 0.9rem;
+	line-height: 1.6;
+	color: color-mix(in oklch, currentColor 72%, transparent);
+}
+
+.ai-answer-review-history-empty {
+	margin: 0.4rem 0 0;
+	font-size: 0.9rem;
+	line-height: 1.6;
+	color: color-mix(in oklch, currentColor 72%, transparent);
+}
+
+.ai-answer-review-history-list {
+	margin: 0.65rem 0 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.65rem;
+}
+
+.ai-answer-review-history-item {
+	padding: 0.7rem 0.85rem;
+	border-radius: 0.9rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 12%, var(--line-divider));
+	background: color-mix(in oklch, var(--card-bg) 92%, var(--primary) 5%);
+}
+
+.ai-answer-review-history-score {
+	font-size: 0.98rem;
+	font-weight: 700;
+	color: var(--primary);
+}
+
+.ai-answer-review-history-panel {
+	margin-top: 0.85rem;
+}
+
+.ai-answer-review-history-toggle {
+	background: color-mix(in oklch, var(--primary) 8%, var(--card-bg));
+	color: var(--primary);
+}
+
+.ai-answer-review-history-content {
+	margin-top: 0.75rem;
 }
 
 .ai-answer-review {
