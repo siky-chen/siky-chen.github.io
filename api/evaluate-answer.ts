@@ -41,6 +41,13 @@ const RUBRIC = [
 	},
 ] as const;
 
+const RUBRIC_WEIGHT_BY_KEY = Object.fromEntries(
+	RUBRIC.map((item) => [item.key, item.weight]),
+);
+const RUBRIC_LABEL_BY_KEY = Object.fromEntries(
+	RUBRIC.map((item) => [item.key, item.label]),
+);
+
 function sendJson(res: any, status: number, body: Record<string, unknown>) {
 	Object.entries(corsHeaders).forEach(([key, value]) => {
 		res.setHeader(key, value);
@@ -134,11 +141,17 @@ function normalizeRubricScores(value: unknown) {
 			if (!item || typeof item !== "object") return null;
 
 			const key = typeof item.key === "string" ? item.key : "";
-			const label = typeof item.label === "string" ? item.label : "";
+			const label = key && RUBRIC_LABEL_BY_KEY[key]
+				? RUBRIC_LABEL_BY_KEY[key]
+				: typeof item.label === "string"
+					? item.label
+					: "";
 			const score = clampScore(item.score, 1, 5);
-			const weight = clampScore(item.weight, 0, 100);
 			const reason =
 				typeof item.reason === "string" ? item.reason.trim() : "";
+			const weight = key && RUBRIC_WEIGHT_BY_KEY[key]
+				? RUBRIC_WEIGHT_BY_KEY[key]
+				: clampScore(item.weight, 0, 100);
 
 			if (!key && !label) return null;
 
