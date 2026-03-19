@@ -173,6 +173,57 @@ const {
 		return block;
 	}
 
+	function buildRubricBlock(rubricScores) {
+		if (!Array.isArray(rubricScores) || rubricScores.length === 0) return null;
+
+		const block = createTextElement("div", "ai-answer-review-result-block", "");
+		block.appendChild(
+			createTextElement("div", "ai-answer-review-result-title", "Rubric 评分"),
+		);
+
+		const list = createTextElement("ul", "ai-answer-review-rubric-list", "");
+
+		rubricScores.forEach((item) => {
+			if (!item || typeof item !== "object") return;
+
+			const entry = createTextElement("li", "ai-answer-review-rubric-item", "");
+			const label = createTextElement(
+				"div",
+				"ai-answer-review-rubric-label",
+				"",
+			);
+			const score = createTextElement(
+				"div",
+				"ai-answer-review-rubric-score",
+				"",
+			);
+			const reason = createTextElement(
+				"div",
+				"ai-answer-review-rubric-reason",
+				"",
+			);
+
+			const itemLabel = item.label || item.key || "未命名维度";
+			label.textContent = String(itemLabel);
+			score.textContent = `${Number(item.score || 0)}/5 · ${Number(
+				item.weight || 0,
+			)}%`;
+			reason.textContent = item.reason ? String(item.reason) : "";
+
+			entry.appendChild(label);
+			entry.appendChild(score);
+			if (reason.textContent) {
+				entry.appendChild(reason);
+			}
+			list.appendChild(entry);
+		});
+
+		if (!list.children.length) return null;
+
+		block.appendChild(list);
+		return block;
+	}
+
 	function renderResult(resultNode, data) {
 		resultNode.innerHTML = "";
 		resultNode.hidden = false;
@@ -204,8 +255,10 @@ const {
 		const strengths = buildResultList("回答亮点", data.strengths);
 		const improvements = buildResultList("改进建议", data.improvements);
 		const followUps = buildResultList("可能追问", data.followUps);
+		const rubric = buildRubricBlock(data.rubricScores);
 
 		if (strengths) resultNode.appendChild(strengths);
+		if (rubric) resultNode.appendChild(rubric);
 		if (improvements) resultNode.appendChild(improvements);
 
 		if (data.betterAnswer) {
@@ -413,7 +466,7 @@ const {
 		const helper = createTextElement(
 			"p",
 			"ai-answer-review-helper",
-			"评分会结合题目和参考答案，从正确性、完整性、条理和项目结合度几个维度给建议。",
+			"评分会结合题目、参考答案和 rubric，从准确性、完整性、逻辑性、项目结合度几个维度给建议。",
 		);
 		const historySection = createTextElement(
 			"section",
@@ -906,6 +959,40 @@ const {
 
 .ai-answer-review-result-list {
 	padding-left: 1.1rem;
+}
+
+.ai-answer-review-rubric-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.55rem;
+}
+
+.ai-answer-review-rubric-item {
+	padding: 0.7rem 0.8rem;
+	border-radius: 0.85rem;
+	border: 1px solid color-mix(in oklch, var(--primary) 14%, var(--line-divider));
+	background: color-mix(in oklch, var(--card-bg) 94%, var(--primary) 4%);
+}
+
+.ai-answer-review-rubric-label {
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.ai-answer-review-rubric-score {
+	margin-top: 0.15rem;
+	font-size: 0.88rem;
+	font-weight: 600;
+	color: var(--primary);
+}
+
+.ai-answer-review-rubric-reason {
+	margin-top: 0.3rem;
+	font-size: 0.88rem;
+	line-height: 1.65;
+	color: color-mix(in oklch, currentColor 72%, transparent);
 }
 
 .ai-answer-review-better-answer {
