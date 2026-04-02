@@ -438,15 +438,14 @@ export const shareConfig: ShareConfig = {
 };
 
 export const announcementConfig: AnnouncementConfig = {
-	title: "域名迁移公告", // 公告标题，填空使用i18n字符串Key.announcement
-	content:
-		"本站将于 2026-03-27 停止使用 GitHub Pages 域名，之后将使用新域名访问：siky-chen.me", // 公告内容
+	title: "", // 公告标题，填空使用i18n字符串Key.announcement
+	content: "记录学习的小blog", // 公告内容
 	closable: true, // 允许用户关闭公告
 	link: {
 		enable: true, // 启用链接
-		text: "前往新域名", // 链接文本
-		url: "https://siky-chen.me", // 链接 URL
-		external: true, // 外部链接
+		text: "Learn More", // 链接文本
+		url: "/about/", // 链接 URL
+		external: false, // 内部链接
 	},
 };
 
