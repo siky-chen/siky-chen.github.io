@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   build:
+    if: false # Temporarily disable static site generation during deployment
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js
@@ -42,6 +43,7 @@ jobs:
           UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
 
   deploy:
+    if: false # Temporarily disable pages deployment
     needs: build
     runs-on: ubuntu-latest
     environment:

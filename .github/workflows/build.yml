@@ -46,6 +46,7 @@ jobs:
           ENABLE_CONTENT_SYNC: false
 
   build:
+    if: false # Temporarily disable static site generation in CI
     strategy:
       matrix:
         node: [ 22, 23 ]

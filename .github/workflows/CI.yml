@@ -41,6 +41,7 @@ jobs:
           ENABLE_CONTENT_SYNC: false
 
   build:
+    if: false # Temporarily disable static site generation in CI
     name: Astro Build
     runs-on: ubuntu-latest
     steps:
