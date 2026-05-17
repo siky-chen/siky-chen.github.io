@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" role="img" aria-labelledby="title desc">
+  <title id="title">EtherCAT logo cover</title>
+  <desc id="desc">EtherCAT wordmark with a red arrow on a white background.</desc>
+  <rect width="900" height="400" fill="#ffffff"/>
+  <g transform="translate(8 78)">
+    <text x="0" y="190"
+      fill="#151515"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="170"
+      font-weight="400"
+      letter-spacing="-7">Ether</text>
+    <text x="395" y="190"
+      fill="#151515"
+      font-family="Arial Black, Arial, Helvetica, sans-serif"
+      font-size="170"
+      font-weight="900"
+      letter-spacing="-9">CAT</text>
+    <text x="646" y="190"
+      fill="#151515"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="46"
+      font-weight="700">®</text>
+  </g>
+  <g transform="translate(558 45)">
+    <path d="M0 62H246V0L330 98H0Z" fill="#e30613"/>
+    <path d="M142 111H330V174H204Z" fill="#151515"/>
+  </g>
+</svg>
