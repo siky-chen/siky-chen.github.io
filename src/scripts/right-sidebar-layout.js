@@ -5,62 +5,48 @@
  * 初始化页面布局
  * @param {string} pageType - 页面类型（projects, skills等）
  */
-function initPageLayout(pageType) {
-	// 获取布局配置
-	const defaultPostListLayout =
-		localStorage.getItem("postListLayout") || "list";
+function isLayoutSwitchEnabled() {
+	return document.documentElement.getAttribute("data-post-list-layout-enabled") !== "false";
+}
 
-	// 如果默认布局是网格模式，则隐藏右侧边栏
-	if (defaultPostListLayout === "grid") {
+function getPostListLayout() {
+	return isLayoutSwitchEnabled() ? (localStorage.getItem("postListLayout") || "list") : "list";
+}
+
+function applyCurrentPageLayout() {
+	if (getPostListLayout() === "grid") {
 		hideRightSidebar();
 	} else {
 		showRightSidebar();
 	}
+}
+
+function initPageLayout(pageType) {
+	applyCurrentPageLayout();
 
 	// 监听布局切换事件
-	window.addEventListener("layoutChange", (event) => {
-		const layout = event.detail.layout;
-		if (layout === "grid") {
-			hideRightSidebar();
-		} else {
-			showRightSidebar();
-		}
+	window.addEventListener("layoutChange", () => {
+		applyCurrentPageLayout();
 	});
 
 	// 监听本地存储变化（用于跨标签页同步）
 	window.addEventListener("storage", (event) => {
 		if (event.key === "postListLayout") {
-			if (event.newValue === "grid") {
-				hideRightSidebar();
-			} else {
-				showRightSidebar();
-			}
+			applyCurrentPageLayout();
 		}
 	});
 
 	// 监听页面导航事件
 	document.addEventListener("astro:page-load", () => {
 		setTimeout(() => {
-			const currentLayout =
-				localStorage.getItem("postListLayout") || "list";
-			if (currentLayout === "grid") {
-				hideRightSidebar();
-			} else {
-				showRightSidebar();
-			}
+			applyCurrentPageLayout();
 		}, 100);
 	});
 
 	// 监听SWUP导航事件
 	document.addEventListener("swup:contentReplaced", () => {
 		setTimeout(() => {
-			const currentLayout =
-				localStorage.getItem("postListLayout") || "list";
-			if (currentLayout === "grid") {
-				hideRightSidebar();
-			} else {
-				showRightSidebar();
-			}
+			applyCurrentPageLayout();
 		}, 100);
 	});
 }
@@ -80,7 +66,8 @@ function hideRightSidebar() {
 		// 调整主网格布局
 		const mainGrid = document.getElementById("main-grid");
 		if (mainGrid) {
-			mainGrid.style.gridTemplateColumns = "17.5rem 1fr";
+			mainGrid.style.gridTemplateColumns =
+				"var(--layout-sidebar-width) minmax(0, 1fr)";
 			mainGrid.setAttribute("data-layout-mode", "grid");
 		}
 	}

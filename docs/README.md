@@ -11,6 +11,16 @@
   - 功能特性
   - 基础配置
   - 常见问题
+- **[CONTENT_AUTHORING.md](./CONTENT_AUTHORING.md)** - English content authoring guide
+- **[CONTENT_AUTHORING.zh.md](./CONTENT_AUTHORING.zh.md)** - 简体中文内容编写指南
+- **[CONTENT_AUTHORING.ja.md](./CONTENT_AUTHORING.ja.md)** - 日本語コンテンツ執筆ガイド
+- **[CONTENT_AUTHORING.tw.md](./CONTENT_AUTHORING.tw.md)** - 繁體中文內容編寫指南
+
+所有版本均包括：
+
+  - Frontmatter 字段与示例
+  - Markdown/MDX 扩展
+  - 图片、图表、视频和文章加密
 
 ### 多语言文档
 
@@ -19,6 +29,11 @@
 - **[../README.tw.md](../README.tw.md)** - 繁體中文
 
 ### 内容分离相关
+
+- **[CONTENT_RENDERING.md](./CONTENT_RENDERING.md)** - Markdown/MDX 与 Feed 渲染指南
+  - 图片 caption、宽度和防盗链规则
+  - Wiki Link 封面和 Feed 静态降级
+  - 页面与 Feed 的共享链接分类
 
 - **[CONTENT_SEPARATION.md](./CONTENT_SEPARATION.md)** - 内容分离完整指南 ⭐
   - ENABLE_CONTENT_SYNC 控制开关
@@ -80,6 +95,8 @@
 ```
 docs/
 ├── README.md                    # 本文档 - 索引导航
+├── CONTENT_AUTHORING*.md        # 多语言 Frontmatter 与 Markdown/MDX 写作指南
+├── CONTENT_RENDERING.md         # Markdown/MDX 与 Feed 渲染
 ├── CONTENT_SEPARATION.md        # 内容分离核心指南
 ├── CONTENT_REPOSITORY.md        # 内容仓库结构
 ├── MIGRATION_GUIDE.md           # 迁移指南
@@ -105,6 +122,6 @@ docs/
 
 - 查看 [GitHub Issues](https://github.com/matsuzaka-yuki/Mizuki/issues)
 - 阅读相关文档的故障排查章节
-- 运行 `pnpm run check-env` 检查配置
+- 运行 `pnpm run check` 和 `pnpm run type-check` 检查项目
 
 祝你使用愉快！🎉
