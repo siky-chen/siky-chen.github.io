@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">gPTP 学习笔记封面</title>
+  <desc id="desc">深蓝背景上的 gPTP 和 IEEE 802.1AS 标题，主时钟通过时间感知桥向传感器分发共同时间。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1629"/>
+      <stop offset="1" stop-color="#183654"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#95c3df" stroke-opacity="0.07"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#6bbed8"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#background)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <circle cx="1080" cy="80" r="230" fill="#2ac7ba" opacity="0.05"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="86" y="98" fill="#7dcdda" font-size="20" letter-spacing="4">TIME-SENSITIVE NETWORKING</text>
+    <text x="80" y="252" fill="#f1f7fb" font-size="134" font-weight="700" letter-spacing="-4">gPTP</text>
+    <text x="86" y="315" fill="#b1cbdc" font-size="28">IEEE 802.1AS · Peer Delay · Hardware Timestamps</text>
+    <g text-anchor="middle">
+      <rect x="86" y="384" width="270" height="112" rx="16" fill="#163e47" stroke="#4cd5b8"/>
+      <rect x="466" y="384" width="270" height="112" rx="16" fill="#153047" stroke="#48718b"/>
+      <rect x="846" y="384" width="270" height="112" rx="16" fill="#153047" stroke="#48718b"/>
+      <text x="221" y="430" fill="#83ecd1" font-size="30">Grandmaster</text>
+      <text x="601" y="430" fill="#f1f7fb" font-size="30">Bridge</text>
+      <text x="981" y="430" fill="#f1f7fb" font-size="30">Sensors</text>
+      <g fill="#b1cbdc" font-size="17">
+        <text x="221" y="468">Common time reference</text>
+        <text x="601" y="468">Link &amp; residence delay</text>
+        <text x="981" y="468">Measurement timestamps</text>
+      </g>
+    </g>
+    <path d="M371 440H448M751 440H828" fill="none" stroke="#6bbed8" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="86" y="556" fill="#7c9db5" font-size="18">SYNC + FOLLOW_UP · PDELAY · PHC → SYSTEM CLOCK</text>
+  </g>
+</svg>

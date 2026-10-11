@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">PPS 时间同步学习笔记封面</title>
+  <desc id="desc">深蓝背景上的 PPS 与 GD32 标题，统一秒基准下的雷达、相机和 IMU 同步脉冲。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1629"/>
+      <stop offset="1" stop-color="#183654"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#95c3df" stroke-opacity="0.07"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="600" fill="url(#background)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <circle cx="1080" cy="80" r="230" fill="#2ac7ba" opacity="0.05"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="86" y="96" fill="#7dcdda" font-size="20" letter-spacing="4">MULTI-SENSOR TIME SYNCHRONIZATION</text>
+    <text x="80" y="227" fill="#f1f7fb" font-size="112" font-weight="700" letter-spacing="-3">PPS + GD32</text>
+    <text x="86" y="285" fill="#b1cbdc" font-size="28">LiDAR · Camera · IMU</text>
+    <g font-family="Consolas, 'Courier New', monospace" font-size="20">
+      <text x="86" y="374" fill="#83ecd1">PPS</text>
+      <text x="86" y="438" fill="#7dcdda">CAM</text>
+      <text x="86" y="502" fill="#e8c686">IMU</text>
+      <text x="214" y="337" fill="#7c9db5" font-size="16">0 s</text>
+      <text x="1014" y="337" fill="#7c9db5" font-size="16">1 s</text>
+    </g>
+    <g fill="none" stroke-width="3" stroke-linejoin="round">
+      <path d="M220 345V514M1020 345V514" stroke="#8faabf" stroke-opacity="0.4" stroke-dasharray="6 7"/>
+      <path d="M190 378H220V350H270V378H1020V350H1070V378H1110" stroke="#83ecd1"/>
+      <path d="M190 442H220V414H240V442H420V414H440V442H620V414H640V442H820V414H840V442H1020V414H1040V442H1110" stroke="#7dcdda"/>
+      <path d="M190 506H220V478H232V506H300V478H312V506H380V478H392V506H460V478H472V506H540V478H552V506H620V478H632V506H700V478H712V506H780V478H792V506H860V478H872V506H940V478H952V506H1020V478H1032V506H1110" stroke="#e8c686"/>
+    </g>
+    <text x="86" y="560" fill="#7c9db5" font-size="18">COMMON TIME BASE · HARDWARE TRIGGER · EVENT TIMESTAMPS</text>
+  </g>
+</svg>
