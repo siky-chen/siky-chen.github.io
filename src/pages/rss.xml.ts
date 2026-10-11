@@ -5,6 +5,7 @@ import rss from "@astrojs/rss";
 import type { APIContext, ImageMetadata } from "astro";
 import MarkdownIt from "markdown-it";
 import { parse as htmlParser } from "node-html-parser";
+import path from "node:path";
 import sanitizeHtml from "sanitize-html";
 import { siteConfig } from "@/config";
 import { getSortedPosts } from "@/utils/content-utils";
@@ -17,6 +18,39 @@ const markdownParser = new MarkdownIt();
 const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
 	"/src/content/**/*.{jpeg,jpg,png,gif,webp}", // include posts and assets
 );
+
+function getPostContentDir(post: { id: string; filePath?: string }) {
+	const filePath = post.filePath?.replace(/\\/g, "/");
+	if (filePath?.startsWith("src/content/posts/")) {
+		const relativePath = filePath.replace(/^src\/content\/posts\//, "");
+		const dir = path.posix.dirname(relativePath);
+		return dir === "." ? "" : dir;
+	}
+
+	return post.id.includes("/")
+		? path.posix.dirname(post.id)
+		: post.id;
+}
+
+function getImageImportCandidates(
+	src: string,
+	post: { id: string; filePath?: string },
+) {
+	const postDir = getPostContentDir(post);
+	const normalizedSrc = src.startsWith("./") ? src.slice(2) : src;
+
+	if (src.startsWith("../")) {
+		const base = postDir ? `/src/content/posts/${postDir}` : "/src/content/posts";
+		return [path.posix.normalize(`${base}/${src}`)];
+	}
+
+	const candidates: string[] = [];
+	if (postDir) {
+		candidates.push(`/src/content/posts/${postDir}/${normalizedSrc}`);
+	}
+	candidates.push(`/src/content/posts/${normalizedSrc}`);
+	return candidates;
+}
 
 export async function GET(context: APIContext) {
 	if (!context.site) {
@@ -51,47 +85,15 @@ export async function GET(context: APIContext) {
 				src.startsWith("../") ||
 				(!src.startsWith("http") && !src.startsWith("/"))
 			) {
-				let importPath: string | null = null;
-
-				if (src.startsWith("./")) {
-					// Path relative to the post file directory
-					const prefixRemoved = src.slice(2);
-					// Check if this post is in a subdirectory (like bestimageapi/index.md)
-					const postPath = post.id; // This gives us the full path like "bestimageapi/index.md"
-					const postDir = postPath.includes("/")
-						? postPath.split("/")[0]
-						: "";
-
-					if (postDir) {
-						// For posts in subdirectories
-						importPath = `/src/content/posts/${postDir}/${prefixRemoved}`;
-					} else {
-						// For posts directly in posts directory
-						importPath = `/src/content/posts/${prefixRemoved}`;
-					}
-				} else if (src.startsWith("../")) {
-					// Path like ../assets/images/xxx -> relative to /src/content/
-					const cleaned = src.replace(/^\.\.\//, "");
-					importPath = `/src/content/${cleaned}`;
-				} else {
-					// Handle direct filename (no ./ prefix) - assume it's in the same directory as the post
-					const postPath = post.id; // This gives us the full path like "bestimageapi/index.md"
-					const postDir = postPath.includes("/")
-						? postPath.split("/")[0]
-						: "";
-
-					if (postDir) {
-						// For posts in subdirectories
-						importPath = `/src/content/posts/${postDir}/${src}`;
-					} else {
-						// For posts directly in posts directory
-						importPath = `/src/content/posts/${src}`;
-					}
-				}
-
-				const imageMod = await imagesGlob[importPath]?.()?.then(
-					(res) => res.default,
+				const importCandidates = getImageImportCandidates(src, post);
+				const matchedImportPath = importCandidates.find(
+					(importPath) => imagesGlob[importPath],
 				);
+				const imageMod = matchedImportPath
+					? await imagesGlob[matchedImportPath]?.()?.then(
+							(res) => res.default,
+						)
+					: null;
 				if (imageMod) {
 					const optimizedImg = await getImage({ src: imageMod });
 					img.setAttribute(
@@ -99,9 +101,8 @@ export async function GET(context: APIContext) {
 						new URL(optimizedImg.src, context.site).href,
 					);
 				} else {
-					// Debug: log the failed import path
 					console.log(
-						`Failed to load image: ${importPath} for post: ${post.id}`,
+						`Failed to load image: ${importCandidates.join(", ")} for post: ${post.id}`,
 					);
 				}
 			} else if (src.startsWith("/")) {

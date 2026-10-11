@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">CiA 402 学习笔记封面</title>
+  <desc id="desc">深蓝背景上的 CiA 402 标题与控制字 0x0006、0x0007、0x000F 组成的使能流程。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1629"/>
+      <stop offset="1" stop-color="#183654"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#95c3df" stroke-opacity="0.07"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#6bbed8"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="600" fill="url(#background)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+  <circle cx="1080" cy="80" r="230" fill="#2ac7ba" opacity="0.05"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="86" y="110" fill="#7dcdda" font-size="20" letter-spacing="4">DRIVES &amp; MOTION CONTROL</text>
+    <text x="80" y="258" fill="#f1f7fb" font-size="120" font-weight="700" letter-spacing="-4">CiA 402</text>
+    <text x="86" y="324" fill="#b1cbdc" font-size="28">State Machine · Object Dictionary · CANopen / CoE</text>
+    <g font-family="Consolas, 'Courier New', monospace" font-size="34" text-anchor="middle">
+      <rect x="86" y="390" width="270" height="108" rx="16" fill="#153047" stroke="#48718b"/>
+      <rect x="466" y="390" width="270" height="108" rx="16" fill="#153047" stroke="#48718b"/>
+      <rect x="846" y="390" width="270" height="108" rx="16" fill="#163e47" stroke="#4cd5b8"/>
+      <text x="221" y="437" fill="#f1f7fb">0x0006</text>
+      <text x="601" y="437" fill="#f1f7fb">0x0007</text>
+      <text x="981" y="437" fill="#83ecd1">0x000F</text>
+    </g>
+    <g fill="#b1cbdc" font-size="17" text-anchor="middle">
+      <text x="221" y="473">Ready to switch on</text>
+      <text x="601" y="473">Switched on</text>
+      <text x="981" y="473">Operation enabled</text>
+    </g>
+    <path d="M371 444H448M751 444H828" fill="none" stroke="#6bbed8" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="86" y="555" fill="#7c9db5" font-size="18">CONTROLWORD 0x6040 → STATUSWORD 0x6041</text>
+  </g>
+</svg>

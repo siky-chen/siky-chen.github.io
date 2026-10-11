@@ -127,20 +127,15 @@ const {
     async function fetchPageViews(retryCount = 0) {
         const container = document.querySelector('.umami-page-views');
 
-        if (!window.oddmisc) {
-            if (retryCount < 10) {
-                setTimeout(() => fetchPageViews(retryCount + 1), 500);
-                return;
-            }
-            container?.classList.add('hidden');
-            return;
-        }
-
         const id = container?.dataset.id;
         if (!id) return;
 
         try {
-            const stats = await window.oddmisc.getStats(`/posts/${id}/`);
+            const response = await fetch(`/api/umami-stats?path=${encodeURIComponent(`/posts/${id}/`)}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch page views: ${response.status}`);
+            }
+            const stats = await response.json();
             const pageViews = stats.pageviews || 0;
             const visitors = stats.visitors || 0;
 
