@@ -4,27 +4,30 @@ import { fullscreenWallpaperConfig, sakuraConfig, siteConfig } from "@/config";
 import type { LIGHT_DARK_MODE, WALLPAPER_MODE } from "@/types/config";
 
 export function getDefaultHue(): number {
-	const fallback = "250";
-	const configCarrier = document.getElementById("config-carrier");
-	if (!configCarrier) {
-		return Number.parseInt(fallback, 10);
-	}
-	return Number.parseInt(configCarrier.dataset.hue || fallback, 10);
+	return siteConfig.themeColor.hue;
 }
 
 export function getHue(): number {
 	if (siteConfig.themeColor.fixed) return getDefaultHue();
 	const stored = localStorage.getItem("hue");
-	return stored ? Number.parseInt(stored, 10) : getDefaultHue();
+	const hue = stored?.trim() ? Number(stored) : Number.NaN;
+	return Number.isFinite(hue) && hue >= 0 && hue <= 360 ? hue : getDefaultHue();
 }
 
 export function setHue(hue: number): void {
-	localStorage.setItem("hue", String(hue));
+	const resolvedHue =
+		!siteConfig.themeColor.fixed &&
+		Number.isFinite(hue) &&
+		hue >= 0 &&
+		hue <= 360
+			? hue
+			: getDefaultHue();
+	localStorage.setItem("hue", String(resolvedHue));
 	const r = document.querySelector(":root") as HTMLElement;
 	if (!r) {
 		return;
 	}
-	r.style.setProperty("--hue", String(hue));
+	r.style.setProperty("--hue", String(resolvedHue));
 }
 
 export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {

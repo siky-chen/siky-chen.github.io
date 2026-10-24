@@ -10,10 +10,8 @@
   --post-reading-width: 48rem;
 }
 
-/* A post keeps CardTOC as its sole persistent directory. FloatingTOC remains
- * available on demand, while the external desktop directory stays available
- * to other page variants. */
-html[data-layout-variant="post"] #toc-wrapper {
+/* The sidebar card is the article directory when it is configured. */
+html[data-layout-variant="post"]:has(#sidebar .post-toc-widget) #toc-wrapper {
   display: none;
 }
 
@@ -25,8 +23,13 @@ html[data-layout-variant="post"] #toc-wrapper {
  * Visitors can opt out through the settings panel, which flips
  * data-ultrawide-post and restores the shared 90rem composition. */
 @media (width >= 1920px) {
+  /* Reserve a readable desktop directory and a gutter on either side. */
+  html[data-desktop-toc="true"]:not(:has(#sidebar .post-toc-widget)) {
+    --layout-page-width-limit: calc(100vw - 30rem);
+  }
+
   html[data-ultrawide-post="true"][data-layout-variant="post"] {
-    --layout-page-width: clamp(104rem, 82vw, 132rem);
+    --layout-page-width: min(clamp(104rem, 82vw, 132rem), var(--layout-page-width-limit, 100vw));
     --layout-sidebar-width: clamp(17.5rem, 14vw, 19rem);
     --post-reading-width: clamp(48rem, 40vw, 64rem);
   }
@@ -34,7 +37,7 @@ html[data-layout-variant="post"] #toc-wrapper {
 
 @media (width >= 3200px) {
   html[data-ultrawide-post="true"][data-layout-variant="post"] {
-    --layout-page-width: clamp(132rem, 64vw, 152rem);
+    --layout-page-width: min(clamp(132rem, 64vw, 152rem), var(--layout-page-width-limit, 100vw));
     --post-reading-width: clamp(64rem, 20vw + 24rem, 72rem);
   }
 }

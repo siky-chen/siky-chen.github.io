@@ -147,8 +147,12 @@ const favicons: Favicon[] =
 	}
 
 	// Load the hue from local storage
-	const hue = themeColorFixed ? configHue : (localStorage.getItem("hue") || configHue);
-	document.documentElement.style.setProperty("--hue", hue);
+	const storedHue = localStorage.getItem("hue");
+	const hue = storedHue?.trim() ? Number(storedHue) : NaN;
+	const resolvedHue = !themeColorFixed && Number.isFinite(hue) && hue >= 0 && hue <= 360
+		? hue
+		: configHue;
+	document.documentElement.style.setProperty("--hue", String(resolvedHue));
 
 	// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
 	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));

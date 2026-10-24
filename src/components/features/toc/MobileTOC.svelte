@@ -239,7 +239,7 @@ const getActivePadding = (level: number): string => {
 	onclick={togglePanel}
 	aria-label="Table of Contents"
 	id="mobile-toc-switch"
-	class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90 lg:hidden! theme-switch-btn"
+	class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90 xl:hidden! theme-switch-btn"
 >
 	<Icon icon="material-symbols:format-list-bulleted" class="text-[1.25rem]" />
 </button>

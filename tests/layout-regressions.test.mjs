@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "node:test";
+import { sidebarLayoutConfig } from "../src/config/sidebarConfig.ts";
 import { remarkMarkSectionized } from "../src/plugins/remark-mark-sectionized.mjs";
 
 const layoutSource = await readFile(
@@ -47,6 +48,14 @@ const cardTocSource = await readFile(
 	new URL("../src/components/widgets/card-toc/CardTOC.astro", import.meta.url),
 	"utf8",
 );
+const sidebarTocSource = await readFile(
+	new URL("../src/components/features/toc/SidebarTOC.astro", import.meta.url),
+	"utf8",
+);
+const mobileTocSource = await readFile(
+	new URL("../src/components/features/toc/MobileTOC.svelte", import.meta.url),
+	"utf8",
+);
 const variablesSource = await readFile(
 	new URL("../src/styles/variables.styl", import.meta.url),
 	"utf8",
@@ -87,7 +96,10 @@ const settingsPanelSource = await readFile(
 );
 const translationSources = await Promise.all(
 	["en", "zh_CN", "zh_TW", "ja"].map((lang) =>
-		readFile(new URL(`../src/i18n/languages/${lang}.ts`, import.meta.url), "utf8"),
+		readFile(
+			new URL(`../src/i18n/languages/${lang}.ts`, import.meta.url),
+			"utf8",
+		),
 	),
 );
 const packageConfig = JSON.parse(
@@ -339,11 +351,11 @@ describe("Page layout variant regressions", () => {
 		);
 		assert.match(
 			responsiveLayoutStyles,
-			/@media \(width >= 1920px\)[\s\S]*?html\[data-ultrawide-post="true"\]\[data-layout-variant="post"\][\s\S]*?--layout-page-width:\s*clamp\(104rem, 82vw, 132rem\)/,
+			/@media \(width >= 1920px\)[\s\S]*?html\[data-ultrawide-post="true"\]\[data-layout-variant="post"\][\s\S]*?--layout-page-width:\s*min\(clamp\(104rem, 82vw, 132rem\), var\(--layout-page-width-limit, 100vw\)\)/,
 		);
 		assert.match(
 			responsiveLayoutStyles,
-			/@media \(width >= 3200px\)[\s\S]*?--layout-page-width:\s*clamp\(132rem, 64vw, 152rem\)/,
+			/@media \(width >= 3200px\)[\s\S]*?--layout-page-width:\s*min\(clamp\(132rem, 64vw, 152rem\), var\(--layout-page-width-limit, 100vw\)\)/,
 		);
 		assert.match(
 			responsiveLayoutStyles,
@@ -417,8 +429,8 @@ describe("Page layout variant regressions", () => {
 		);
 
 		for (const gatedRule of [
-			/--layout-page-width:\s*clamp\(104rem/,
-			/--layout-page-width:\s*clamp\(132rem/,
+			/--layout-page-width:\s*min\(clamp\(104rem/,
+			/--layout-page-width:\s*min\(clamp\(132rem/,
 		]) {
 			const block = responsiveLayoutStyles
 				.split("@media")
@@ -471,17 +483,89 @@ describe("Page layout variant regressions", () => {
 		);
 	});
 
-	it("keeps one persistent post TOC and shares the configured depth", () => {
-		assert.match(
+	it("honors the desktop TOC setting and reserves room beside wide posts", () => {
+		assert.doesNotMatch(
 			responsiveLayoutStyles,
 			/html\[data-layout-variant="post"\] #toc-wrapper\s*\{\s*display:\s*none/,
 		);
+		assert.match(
+			layoutSource,
+			/data-desktop-toc=\{siteConfig\.toc\.enable && siteConfig\.toc\.desktopSidebar/,
+		);
+		assert.match(
+			responsiveLayoutStyles,
+			/html\[data-desktop-toc="true"\]:not\(:has\(#sidebar \.post-toc-widget\)\)\s*\{\s*--layout-page-width-limit:\s*calc\(100vw - 30rem\)/,
+		);
+		for (const viewport of [1920, 2560, 3840]) {
+			const pageWidth = Math.min(
+				viewport - 30 * 16,
+				viewport >= 3200
+					? Math.min(152 * 16, Math.max(132 * 16, viewport * 0.64))
+					: Math.min(132 * 16, Math.max(104 * 16, viewport * 0.82)),
+			);
+			assert.ok((viewport - pageWidth) / 2 - 16 >= 14 * 16);
+		}
+	});
+
+	it("shares the configured TOC depth", () => {
 		assert.match(cardTocSource, /const tocDepth = siteConfig\.toc\.depth/);
 		assert.match(cardTocSource, /maxLevel,/);
 		assert.doesNotMatch(cardTocSource, /maxLevel:\s*3/);
 		assert.match(
 			variablesSource,
 			/--toc-width:\s*clamp\(0rem,[\s\S]*?var\(--layout-page-width\)[\s\S]*?22rem\)/,
+		);
+	});
+
+	it("restores the upstream article directory in the persistent sidebar", () => {
+		const stickyComponents = sidebarLayoutConfig.components.left.filter(
+			(type) =>
+				sidebarLayoutConfig.properties.some(
+					(property) =>
+						property.type === type && property.position === "sticky",
+				),
+		);
+		assert.equal(stickyComponents[0], "card-toc");
+		assert.match(cardTocSource, /post-toc-widget group/);
+		assert.match(
+			cardTocSource,
+			/html:not\(\[data-layout-variant="post"\]\) \.post-toc-widget/,
+		);
+		assert.match(cardTocSource, /data-card-toc-root\s+data-no-swup/);
+		assert.match(
+			cardTocSource,
+			/addEventListener\("swup:page:view",[\s\S]*?setTimeout\(initAllCardTOCs, 100\)/,
+		);
+		assert.match(
+			responsiveLayoutStyles,
+			/html\[data-layout-variant="post"\]:has\(#sidebar \.post-toc-widget\) #toc-wrapper\s*\{\s*display:\s*none/,
+		);
+	});
+
+	it("keeps directory links on the TOC scroll handler and constrains long labels", () => {
+		assert.match(sidebarTocSource, /<table-of-contents[^>]*data-no-swup/);
+		assert.match(sidebarTocSource, /scrollToHeading\(id, this\.navbarHeight\)/);
+		assert.match(sidebarTocSource, /import "@\/styles\/toc\.css"/);
+		assert.match(sidebarTocSource, /class="toc-item toc-level-/);
+		assert.match(sidebarTocSource, /class="toc-label /);
+		assert.match(
+			sidebarTocSource,
+			/this\.querySelector\("\.toc-active-indicator"\)/,
+		);
+	});
+
+	it("keeps the directory button available until the desktop directory appears", () => {
+		assert.match(
+			mobileTocSource,
+			/id="mobile-toc-switch"\s+class="[^"]*xl:hidden!/,
+		);
+		assert.doesNotMatch(
+			mobileTocSource,
+			/id="mobile-toc-switch"\s+class="[^"]*\blg:hidden!/,
+		);
+		assert.match(
+			mainGridLayoutSource,
+			/id="toc-wrapper"[\s\S]*?hidden xl:block/,
 		);
 	});
 });

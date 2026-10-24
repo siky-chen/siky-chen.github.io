@@ -4,6 +4,8 @@
  * 基于 Web Component 实现，支持 IntersectionObserver 滚动监听
  */
 
+import "@/styles/toc.css";
+
 import type { MarkdownHeading } from "astro";
 
 interface Props {
@@ -14,7 +16,7 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<table-of-contents class:list={[className, "group"]} id="toc">
+<table-of-contents class:list={[className, "group"]} id="toc" data-no-swup>
 </table-of-contents>
 
 <script>
@@ -226,7 +228,7 @@ const { class: className } = Astro.props;
 				capture: true,
 			});
 
-			this.activeIndicator = document.getElementById("active-indicator");
+			this.activeIndicator = this.querySelector(".toc-active-indicator");
 
 			this.tocEntries = Array.from(
 				this.querySelectorAll<HTMLAnchorElement>("a[href^='#']"),
@@ -290,12 +292,7 @@ const { class: className } = Astro.props;
 			let h1Count = 1;
 			const tocHTML = tocItems
 				.map((item) => {
-					const depthClass =
-						item.depth === 0
-							? ""
-							: item.depth === 1
-								? "ml-4"
-								: "ml-8";
+					const depthLevel = Math.min(item.depth, 2);
 
 					let badgeContent: string;
 					if (item.depth === 0) {
@@ -306,25 +303,31 @@ const { class: className } = Astro.props;
 								: h1Count.toString();
 						h1Count++;
 					} else if (item.depth === 1) {
-						badgeContent =
-							'<div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>';
+						badgeContent = '<span class="toc-badge-dot"></span>';
 					} else {
 						badgeContent =
-							'<div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>';
+							'<span class="toc-badge-dot toc-badge-dot-sm"></span>';
 					}
 
-					return `<a href="#${item.id}" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2">
-					<div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ${depthClass} ${item.depth === 0 ? "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]" : ""}">
+					return `<a href="#${item.id}" class="toc-item toc-level-${depthLevel}">
+					<div class="toc-badge ${item.depth === 0 ? "toc-badge-index" : ""}">
 						${badgeContent}
 					</div>
-					<div class="transition text-sm ${item.depth <= 1 ? "text-50" : "text-30"}">${item.text}</div>
+					<div class="toc-label ${item.depth <= 1 ? "toc-label-primary" : "toc-label-secondary"}"></div>
 				</a>`;
 				})
 				.join("");
 
 			this.innerHTML =
 				tocHTML +
-				'<div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div>';
+				'<div style="opacity: 0" class="toc-active-indicator"></div>';
+			this.querySelectorAll<HTMLAnchorElement>(".toc-item").forEach(
+				(entry, index) => {
+					const item = tocItems[index];
+					entry.querySelector(".toc-label")!.textContent = item.text;
+					entry.title = item.text;
+				},
+			);
 			this.dataset.loaded = "true";
 		}
 

@@ -29,6 +29,13 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			animationDelay: 50,
 		},
 		{
+			// 文章目录随正文滚动，放在粘性组件的首位。
+			type: "card-toc",
+			position: "sticky",
+			class: "onload-animation",
+			animationDelay: 200,
+		},
+		{
 			// 组件类型：分类组件
 			type: "categories",
 			// 组件位置："sticky" 表示粘性定位，可滚动
@@ -82,7 +89,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 
 	// 侧栏组件布局配置
 	components: {
-		left: ["profile", "announcement", "categories", "tags"],
+		left: ["profile", "announcement", "card-toc", "categories", "tags"],
 		right: ["site-stats", "calendar"],
 		drawer: ["profile", "announcement", "categories", "tags"],
 	},

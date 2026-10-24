@@ -28,11 +28,12 @@ const tocDepth = siteConfig.toc.depth;
 <WidgetLayout
 	name={i18n(I18nKey.tableOfContents)}
 	id="card-toc"
-	class={"group " + (className || "")}
+	class={"post-toc-widget group " + (className || "")}
 	style={style}
 >
 	<div
 		data-card-toc-root
+		data-no-swup
 		data-depth={String(tocDepth)}
 		data-japanese-badge={String(useJapaneseBadge)}
 	>
@@ -43,6 +44,10 @@ const tocDepth = siteConfig.toc.depth;
 </WidgetLayout>
 
 <style>
+	:global(html:not([data-layout-variant="post"]) .post-toc-widget) {
+		display: none;
+	}
+
 	.toc-scroll-container {
 		max-height: 50vh;
 		overflow-y: auto;
@@ -124,6 +129,10 @@ const tocDepth = siteConfig.toc.depth;
 	}
 
 	document.addEventListener("swup:contentReplaced", () => {
+		setTimeout(initAllCardTOCs, 100);
+	});
+
+	document.addEventListener("swup:page:view", () => {
 		setTimeout(initAllCardTOCs, 100);
 	});
 
