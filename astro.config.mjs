@@ -20,13 +20,14 @@ import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
-
+import { loadEnv } from "./scripts/load-env.js";
 import {
 	expressiveCodeConfig,
 	markdownConfig,
 	permalinkConfig,
 	siteConfig,
 } from "./src/config/index.ts";
+import imageGridLinks from "./src/integrations/image-grid-links.mjs";
 import { buildIconInclude } from "./src/plugins/astro-icon-include.mjs";
 import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
 import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badge.ts";
@@ -48,8 +49,6 @@ import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
 import { remarkPlantuml } from "./src/plugins/remark-plantuml.mjs";
 import { remarkWikiLink } from "./src/plugins/remark-wiki-link.mjs";
 import { resolveFontMode } from "./src/utils/fontMode.ts";
-
-import { loadEnv } from "./scripts/load-env.js";
 
 loadEnv();
 
@@ -123,6 +122,7 @@ export default defineConfig({
 	},
 
 	integrations: [
+		imageGridLinks(),
 		oddmisc({
 			umami: {
 				shareUrl: process.env.UMAMI_SHARE_URL || false,

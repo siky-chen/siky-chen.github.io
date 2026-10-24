@@ -7,6 +7,19 @@ import { prepareFeedHtml } from "../src/utils/feed-content.ts";
 import { buildAtomFeed } from "../src/utils/feed-xml.ts";
 
 describe("feed content post-processing", () => {
+	it("uses resolved image URLs for gallery links before making feed URLs absolute", () => {
+		const result = prepareFeedHtml({
+			html: '<a class="image-grid__link" href="diagram.webp"><img src="/_astro/diagram.hash.webp"></a>',
+			site: new URL("https://example.com/"),
+			postUrl: new URL("https://example.com/posts/article/"),
+		});
+		assert.match(
+			result,
+			/href="https:\/\/example\.com\/_astro\/diagram\.hash\.webp"/,
+		);
+		assert.doesNotMatch(result, /posts\/article\/diagram\.webp/);
+	});
+
 	it("keeps static semantics while removing executable and interactive markup", () => {
 		const html = `
 			<script>window.bad = true</script>

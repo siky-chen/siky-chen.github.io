@@ -1,5 +1,6 @@
 import { parse } from "node-html-parser";
 import sanitizeHtml from "sanitize-html";
+import { syncImageGridLinks } from "./image-grid-links.js";
 
 const HTML_TAGS = [
 	"a",
@@ -248,6 +249,7 @@ export function prepareFeedHtml({
 	postUrl,
 }: PrepareFeedHtmlOptions): string {
 	const root = parse(html);
+	syncImageGridLinks(root);
 	root
 		.querySelectorAll("script,template,noscript,svg,style")
 		.forEach((node) => {

@@ -14,6 +14,7 @@ import {
 	type PostItem,
 	scrollToHeading as scrollToHeadingUtil,
 	type TOCItem,
+	updateActiveHeading as getActiveHeading,
 } from "./hooks/useMobileTOC";
 
 let tocItems: TOCItem[] = $state([]);
@@ -44,21 +45,7 @@ const navigateToPost = (url: string) => {
 };
 
 const updateActiveHeading = () => {
-	const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-	const scrollTop = window.scrollY;
-	const offset = 100;
-
-	let currentActiveId = "";
-	headings.forEach((heading) => {
-		if (heading.id) {
-			const elementTop = (heading as HTMLElement).offsetTop - offset;
-			if (scrollTop >= elementTop) {
-				currentActiveId = heading.id;
-			}
-		}
-	});
-
-	activeId = currentActiveId;
+	activeId = getActiveHeading();
 };
 
 const setupIntersectionObserver = () => {

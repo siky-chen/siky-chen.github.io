@@ -3,7 +3,13 @@
  * 处理标题提取、滚动导航等核心功能
  */
 
+import {
+	getHeadingTop,
+	scrollToHeading as scrollToDocumentHeading,
+} from "../../../../utils/toc-navigation.js";
 import type { HeadingData, TOCScrollOptions } from "../types/toc";
+
+export { getHeadingTop };
 
 /**
  * 从 DOM 中提取标题数据
@@ -33,15 +39,7 @@ export function scrollToHeading(
 	id: string,
 	options: TOCScrollOptions = {},
 ): void {
-	const { offset = 80, behavior = "smooth" } = options;
-	const element = document.getElementById(id);
-	if (!element) {
-		return;
-	}
-
-	const targetTop =
-		element.getBoundingClientRect().top + window.scrollY - offset;
-	window.scrollTo({ top: targetTop, behavior });
+	scrollToDocumentHeading(id, options);
 }
 
 /**

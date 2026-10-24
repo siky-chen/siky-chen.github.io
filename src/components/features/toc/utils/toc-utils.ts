@@ -2,6 +2,7 @@
  * TOC 组件共享工具函数
  */
 
+import { scrollToHeading as scrollToTocHeading } from "../../../../utils/toc-navigation.js";
 import type { HeadingData, TOCConfig, TOCItem } from "../types/toc";
 import { getKatakanaBadge } from "./japanese-katakana";
 
@@ -86,17 +87,7 @@ export function generateTOCItems(
  * @param offset - 顶部偏移量（用于导航栏）
  */
 export function scrollToHeading(id: string, offset = 80): void {
-	const element = document.getElementById(id);
-	if (!element) {
-		return;
-	}
-
-	const targetTop =
-		element.getBoundingClientRect().top + window.scrollY - offset;
-	window.scrollTo({
-		top: targetTop,
-		behavior: "smooth",
-	});
+	scrollToTocHeading(id, { offset });
 }
 
 /**

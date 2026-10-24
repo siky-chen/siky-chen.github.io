@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import { pioConfig } from "../src/config/pioConfig.ts";
 
 const bannerSource = await readFile(
 	new URL("../src/components/layout/Banner.astro", import.meta.url),
@@ -48,6 +49,13 @@ const musicCoverSource = await readFile(
 );
 
 describe("Default image loading boundary", () => {
+	it("only configures Live2D models that exist in public assets", async () => {
+		assert.ok(pioConfig.models.length > 0);
+		for (const model of pioConfig.models) {
+			await readFile(new URL(`../public${model}`, import.meta.url), "utf8");
+		}
+	});
+
 	it("uses media-qualified responsive sources for the first banner", () => {
 		assert.match(bannerSource, /ViewportImage/);
 		assert.match(bannerSource, /media="\(max-width: 767px\)"/);

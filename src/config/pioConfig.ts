@@ -3,7 +3,7 @@ import type { PioConfig } from "../types/config";
 // Pio 看板娘配置
 export const pioConfig: PioConfig = {
 	enable: true, // 启用看板娘
-	models: ["/pio/models/umaru/model.json", "/pio/models/pio/model.json"], // 默认模型路径
+	models: ["/pio/models/umaru/model.json"], // 保留已有模型，避免切换到缺失资源
 	position: "left", // 模型位置
 	width: Math.round(280 * 0.7), // 默认宽度
 	height: Math.round(250 * 0.7), // 默认高度

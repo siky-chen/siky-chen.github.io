@@ -3,6 +3,8 @@
  * 管理图片灯箱的初始化和清理
  */
 
+import { syncImageGridLinks } from "../../utils/image-grid-links.js";
+
 import {
 	FANCYBOX_SELECTORS,
 	type FancyboxConfig,
@@ -26,6 +28,7 @@ export class FancyboxHandler {
 	 * 按需加载 Fancybox 模块和样式
 	 */
 	async init(): Promise<void> {
+		syncImageGridLinks(document);
 		const hasImages = this.checkForImages();
 
 		if (!hasImages) {

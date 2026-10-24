@@ -7,6 +7,7 @@
 import { JAPANESE_KATAKANA } from "../components/features/toc/utils/japanese-katakana";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
+import { scrollToHeading } from "./toc-navigation.js";
 
 export interface TOCConfig {
 	contentId?: string;
@@ -362,19 +363,7 @@ export class TOCManager {
 		const id = decodeURIComponent(
 			target.getAttribute("href")?.substring(1) || "",
 		);
-		const targetElement = document.getElementById(id);
-
-		if (targetElement) {
-			const targetTop =
-				targetElement.getBoundingClientRect().top +
-				window.pageYOffset -
-				this.scrollOffset;
-
-			window.scrollTo({
-				top: targetTop,
-				behavior: "smooth",
-			});
-		}
+		scrollToHeading(id, { offset: this.scrollOffset });
 	}
 
 	public setupObserver(): void {

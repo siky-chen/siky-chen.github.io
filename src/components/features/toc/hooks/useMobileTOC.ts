@@ -3,6 +3,11 @@
  * 处理移动端目录的状态管理和交互逻辑
  */
 
+import {
+	getHeadingTop,
+	scrollToHeading as scrollToTocHeading,
+} from "../../../../utils/toc-navigation.js";
+
 export interface TOCItem {
 	id: string;
 	text: string;
@@ -130,7 +135,7 @@ export function updateActiveHeading(): string {
 	let currentActiveId = "";
 	headings.forEach((heading) => {
 		if (heading.id) {
-			const elementTop = (heading as HTMLElement).offsetTop - offset;
+			const elementTop = getHeadingTop(heading as HTMLElement) - offset;
 			if (scrollTop >= elementTop) {
 				currentActiveId = heading.id;
 			}
@@ -144,14 +149,7 @@ export function updateActiveHeading(): string {
  * 滚动到指定标题
  */
 export function scrollToHeading(id: string, offset = 80): void {
-	const element = document.getElementById(id);
-	if (element) {
-		const elementPosition = element.offsetTop - offset;
-		window.scrollTo({
-			top: elementPosition,
-			behavior: "smooth",
-		});
-	}
+	scrollToTocHeading(id, { offset });
 }
 
 /**
